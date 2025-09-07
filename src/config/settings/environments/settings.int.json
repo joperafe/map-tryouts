@@ -1,11 +1,11 @@
 {
   "environment": "INT",
   "api": {
-    "baseUrl": "https://api-int.example.com"
+    "baseUrl": "/data"
   },
   "data": {
-    "sensors": "/api/sensors",
-    "greenzones": "/api/greenzones"
+    "sensors": "/data/sensors.mock.json",
+    "greenzones": "/data/greenzones.mock.json"
   },
   "features": {
     "enableHeatmap": true,
