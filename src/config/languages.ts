@@ -31,9 +31,9 @@ export const supportedLanguages: Language[] = [];
 export const defaultLanguage: string = '';
 
 export const getLanguageByCode = (code: string): Language | undefined => {
-  return supportedLanguages.find(lang => lang.code === code);
+  return getSupportedLanguages().find(lang => lang.code === code);
 };
 
 export const isLanguageSupported = (code: string): boolean => {
-  return supportedLanguages.some(lang => lang.code === code);
+  return getSupportedLanguages().some(lang => lang.code === code);
 };

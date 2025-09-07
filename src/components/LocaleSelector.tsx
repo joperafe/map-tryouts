@@ -8,11 +8,23 @@ export const LocaleSelector: React.FC = () => {
   const supportedLanguages = getSupportedLanguages();
   const currentLanguage = getLanguageByCode(i18n.language) || supportedLanguages[0];
 
+  // Debug logging
+  console.log('LocaleSelector debug:', {
+    'i18n.language': i18n.language,
+    'supportedLanguages': supportedLanguages,
+    'currentLanguage': currentLanguage
+  });
+
   const handleLanguageChange = (languageCode: string) => {
+    console.log('Language change requested:', languageCode);
     if (isLanguageSupported(languageCode)) {
+      console.log('Language is supported, changing...');
       i18n.changeLanguage(languageCode);
       // Store language preference in localStorage
       localStorage.setItem('language', languageCode);
+      console.log('Language changed to:', languageCode);
+    } else {
+      console.log('Language not supported:', languageCode);
     }
   };
 
