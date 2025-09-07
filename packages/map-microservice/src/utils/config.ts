@@ -1,4 +1,4 @@
-import { MapConfig, Layer } from '../types';
+import type { MapConfig, Layer } from '../types';
 
 /**
  * Creates a map configuration with sensible defaults
@@ -47,14 +47,14 @@ export function createMapConfig(overrides: Partial<MapConfig> = {}): MapConfig {
       ...defaultConfig.features,
       ...overrides.features,
       drawing: overrides.features?.drawing ? {
-        enabled: overrides.features.drawing.enabled ?? defaultConfig.features.drawing!.enabled,
-        tools: overrides.features.drawing.tools ?? defaultConfig.features.drawing!.tools,
-        style: overrides.features.drawing.style ?? defaultConfig.features.drawing!.style,
-      } : defaultConfig.features.drawing,
+        enabled: overrides.features.drawing.enabled ?? defaultConfig.features!.drawing!.enabled,
+        tools: overrides.features.drawing.tools ?? defaultConfig.features!.drawing!.tools,
+        style: overrides.features.drawing.style ?? defaultConfig.features!.drawing!.style,
+      } : defaultConfig.features!.drawing,
       measurement: overrides.features?.measurement ? {
-        enabled: overrides.features.measurement.enabled ?? defaultConfig.features.measurement!.enabled,
-        units: overrides.features.measurement.units ?? defaultConfig.features.measurement!.units,
-      } : defaultConfig.features.measurement,
+        enabled: overrides.features.measurement.enabled ?? defaultConfig.features!.measurement!.enabled,
+        units: overrides.features.measurement.units ?? defaultConfig.features!.measurement!.units,
+      } : defaultConfig.features!.measurement,
     },
   };
 }

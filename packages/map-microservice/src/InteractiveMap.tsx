@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-import { InteractiveMapProps, MarkerLayer, PolygonLayer, HeatmapLayer } from './types';
+import type { InteractiveMapProps, MarkerLayer, PolygonLayer, HeatmapLayer } from './types';
 
 // Fix for default Leaflet icons
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: () => string })._getIconUrl;

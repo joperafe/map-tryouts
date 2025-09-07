@@ -1,7 +1,7 @@
 import React from 'react';
 import { Marker, Popup, Polygon, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
-import { Layer, MarkerLayer, PolygonLayer, MapEvents } from '../types';
+import type { Layer, MarkerLayer, PolygonLayer, MapEvents } from '../types';
 
 interface LayerRendererProps {
   layers: Layer[];

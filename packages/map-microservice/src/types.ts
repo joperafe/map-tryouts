@@ -1,4 +1,4 @@
-import { LatLngExpression, Map as LeafletMap } from 'leaflet';
+import type { LatLngExpression, Map as LeafletMap } from 'leaflet';
 import React from 'react';
 
 // Core Map Types
