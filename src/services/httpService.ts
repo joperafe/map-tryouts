@@ -9,6 +9,7 @@ class HttpService {
 
   private async fetchWithErrorHandling<T>(url: string): Promise<APIResponse<T>> {
     try {
+      console.log('Fetching from:', url); // Debug log
       const response = await fetch(url);
       
       if (!response.ok) {

@@ -71,7 +71,15 @@ const environmentSettings: Record<Environment, EnvironmentSettings> = {
 };
 
 export const getEnvironmentSettings = (env?: string): EnvironmentSettings => {
-  const environment = (env || import.meta.env.VITE_ENVIRONMENT || 'DEV') as Environment;
+  // Force DEV environment in development mode
+  let environment: Environment;
+  
+  if (import.meta.env.DEV) {
+    environment = 'DEV';
+  } else {
+    environment = (env || import.meta.env.VITE_ENVIRONMENT || 'DEV') as Environment;
+  }
+  
   return environmentSettings[environment] || environmentSettings.DEV;
 };
 
@@ -80,6 +88,10 @@ export const getDefaultConfig = (): DefaultConfig => {
 };
 
 export const getCurrentEnvironment = (): Environment => {
+  // Force DEV environment in development mode
+  if (import.meta.env.DEV) {
+    return 'DEV';
+  }
   return (import.meta.env.VITE_ENVIRONMENT || 'DEV') as Environment;
 };
 
