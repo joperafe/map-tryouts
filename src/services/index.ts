@@ -7,10 +7,6 @@ let _httpService: HttpService | null = null;
 export const getHttpService = (): HttpService => {
   if (!_httpService) {
     const config = getConfig();
-    console.log('Loading config:', {
-      environment: config.environment.environment,
-      baseUrl: config.environment.api.baseUrl,
-    });
     _httpService = new HttpService(config.environment.api.baseUrl);
   }
   return _httpService;

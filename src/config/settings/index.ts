@@ -74,31 +74,13 @@ export const getEnvironmentSettings = (env?: string): EnvironmentSettings => {
   // Force DEV environment in development mode
   let environment: Environment;
   
-  // Debug logging
-  console.log('Environment detection:', {
-    'import.meta.env.DEV': import.meta.env.DEV,
-    'import.meta.env.PROD': import.meta.env.PROD,
-    'import.meta.env.MODE': import.meta.env.MODE,
-    'import.meta.env.VITE_ENVIRONMENT': import.meta.env.VITE_ENVIRONMENT,
-    'process.env.NODE_ENV': typeof process !== 'undefined' ? process.env.NODE_ENV : 'undefined',
-    'env parameter': env
-  });
-  
   if (import.meta.env.DEV || import.meta.env.MODE === 'development') {
     environment = 'DEV';
-    console.log('Using DEV environment (development mode detected)');
   } else {
     environment = (env || import.meta.env.VITE_ENVIRONMENT || 'DEV') as Environment;
-    console.log('Using environment:', environment);
   }
   
-  const selectedConfig = environmentSettings[environment] || environmentSettings.DEV;
-  console.log('Selected configuration:', {
-    environment: selectedConfig.environment,
-    baseUrl: selectedConfig.api.baseUrl
-  });
-  
-  return selectedConfig;
+  return environmentSettings[environment] || environmentSettings.DEV;
 };
 
 export const getDefaultConfig = (): DefaultConfig => {
