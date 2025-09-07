@@ -1,11 +1,11 @@
 {
   "environment": "PROD",
   "api": {
-    "baseUrl": "/data"
+    "baseUrl": "/map-tryouts/data"
   },
   "data": {
-    "sensors": "/data/sensors.mock.json",
-    "greenzones": "/data/greenzones.mock.json"
+    "sensors": "/map-tryouts/data/sensors.mock.json",
+    "greenzones": "/map-tryouts/data/greenzones.mock.json"
   },
   "features": {
     "enableHeatmap": false,
