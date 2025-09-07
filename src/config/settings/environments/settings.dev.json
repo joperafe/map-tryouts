@@ -1,0 +1,29 @@
+{
+  "environment": "DEV",
+  "api": {
+    "baseUrl": "/data"
+  },
+  "data": {
+    "sensors": "/data/sensors.mock.json",
+    "greenzones": "/data/greenzones.mock.json"
+  },
+  "features": {
+    "enableHeatmap": true,
+    "enableGreenZones": true
+  },
+  "mapControls": {
+    "position": "topright",
+    "controls": [
+      { "type": "layerToggle", "enabled": true, "label": "Layers" },
+      { "type": "draw", "enabled": true, "label": "Draw" },
+      { "type": "fullscreen", "enabled": true, "label": "Fullscreen" },
+      { "type": "measurement", "enabled": true, "label": "Measure" }
+    ]
+  },
+  "map": {
+    "center": [41.1579, -8.6291],
+    "zoom": 13,
+    "maxZoom": 18,
+    "minZoom": 5
+  }
+}

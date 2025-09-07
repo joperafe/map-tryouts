@@ -1,0 +1,58 @@
+[
+  {
+    "id": "greenzone-001",
+    "name": "City Center Park",
+    "polygon": [
+      [41.1512, -8.6298],
+      [41.1532, -8.6278],
+      [41.1548, -8.6315],
+      [41.1528, -8.6335],
+      [41.1512, -8.6298]
+    ],
+    "area": 15000,
+    "type": "urban_park",
+    "description": "Main urban park in the city center with recreational facilities"
+  },
+  {
+    "id": "greenzone-002",
+    "name": "Riverside Nature Reserve",
+    "polygon": [
+      [41.1420, -8.6150],
+      [41.1480, -8.6080],
+      [41.1520, -8.6120],
+      [41.1460, -8.6190],
+      [41.1420, -8.6150]
+    ],
+    "area": 28000,
+    "type": "nature_reserve",
+    "description": "Protected area along the river with native flora and fauna"
+  },
+  {
+    "id": "greenzone-003",
+    "name": "Community Garden",
+    "polygon": [
+      [41.1650, -8.6420],
+      [41.1665, -8.6400],
+      [41.1672, -8.6425],
+      [41.1657, -8.6445],
+      [41.1650, -8.6420]
+    ],
+    "area": 3500,
+    "type": "community_garden",
+    "description": "Local community garden for sustainable food production"
+  },
+  {
+    "id": "greenzone-004",
+    "name": "Forest Conservation Area",
+    "polygon": [
+      [41.1750, -8.5950],
+      [41.1820, -8.5880],
+      [41.1850, -8.5920],
+      [41.1780, -8.5990],
+      [41.1750, -8.5950]
+    ],
+    "area": 45000,
+    "type": "forest",
+    "description": "Protected forest area with hiking trails and wildlife habitat"
+  }
+]

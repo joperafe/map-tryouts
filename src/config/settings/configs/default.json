@@ -1,0 +1,46 @@
+{
+  "languages": {
+    "supported": [
+      {
+        "code": "en",
+        "name": "English",
+        "flag": "🇺🇸",
+        "nativeName": "English"
+      },
+      {
+        "code": "pt",
+        "name": "Português",
+        "flag": "🇵🇹",
+        "nativeName": "Português"
+      }
+    ],
+    "default": "en"
+  },
+  "themes": {
+    "supported": ["light", "dark", "auto"],
+    "default": "auto"
+  },
+  "dateFormats": {
+    "en": "MM/dd/yyyy",
+    "pt": "dd/MM/yyyy"
+  },
+  "numberFormats": {
+    "en": {
+      "decimal": ".",
+      "thousands": ","
+    },
+    "pt": {
+      "decimal": ",",
+      "thousands": " "
+    }
+  },
+  "ui": {
+    "itemsPerPage": 10,
+    "animationDuration": 200,
+    "debounceTime": 300
+  },
+  "map": {
+    "defaultTileLayer": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "defaultAttribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
+  }
+}

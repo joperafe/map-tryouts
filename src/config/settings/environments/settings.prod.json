@@ -1,0 +1,27 @@
+{
+  "environment": "PROD",
+  "api": {
+    "baseUrl": "https://api.example.com"
+  },
+  "data": {
+    "sensors": "/api/sensors",
+    "greenzones": "/api/greenzones"
+  },
+  "features": {
+    "enableHeatmap": false,
+    "enableGreenZones": false
+  },
+  "mapControls": {
+    "position": "topright",
+    "controls": [
+      { "type": "layerToggle", "enabled": true, "label": "Layers" },
+      { "type": "fullscreen", "enabled": true, "label": "Fullscreen" }
+    ]
+  },
+  "map": {
+    "center": [41.1579, -8.6291],
+    "zoom": 13,
+    "maxZoom": 18,
+    "minZoom": 5
+  }
+}

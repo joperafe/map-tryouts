@@ -1,0 +1,67 @@
+[
+  {
+    "id": "sensor-001",
+    "name": "Downtown Temperature Sensor",
+    "coordinates": [41.1579, -8.6291],
+    "data": {
+      "temperature": 22.5,
+      "humidity": 65,
+      "airQualityIndex": 45,
+      "noiseLevel": 55
+    },
+    "lastUpdated": "2025-09-06T10:30:00Z",
+    "status": "active"
+  },
+  {
+    "id": "sensor-002",
+    "name": "Riverside Environmental Monitor",
+    "coordinates": [41.1492, -8.6118],
+    "data": {
+      "temperature": 21.8,
+      "humidity": 72,
+      "airQualityIndex": 38,
+      "noiseLevel": 48
+    },
+    "lastUpdated": "2025-09-06T10:25:00Z",
+    "status": "active"
+  },
+  {
+    "id": "sensor-003",
+    "name": "Industrial Zone Monitor",
+    "coordinates": [41.1654, -8.5987],
+    "data": {
+      "temperature": 24.2,
+      "humidity": 58,
+      "airQualityIndex": 78,
+      "noiseLevel": 68
+    },
+    "lastUpdated": "2025-09-06T10:28:00Z",
+    "status": "active"
+  },
+  {
+    "id": "sensor-004",
+    "name": "Park Area Sensor",
+    "coordinates": [41.1445, -8.6356],
+    "data": {
+      "temperature": 20.5,
+      "humidity": 80,
+      "airQualityIndex": 25,
+      "noiseLevel": 35
+    },
+    "lastUpdated": "2025-09-06T10:32:00Z",
+    "status": "active"
+  },
+  {
+    "id": "sensor-005",
+    "name": "Airport Weather Station",
+    "coordinates": [41.2481, -8.6814],
+    "data": {
+      "temperature": 23.1,
+      "humidity": 61,
+      "airQualityIndex": 42,
+      "noiseLevel": 72
+    },
+    "lastUpdated": "2025-09-06T10:15:00Z",
+    "status": "inactive"
+  }
+]
