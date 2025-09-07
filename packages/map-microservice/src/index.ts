@@ -38,7 +38,7 @@ export {
   createPolygonLayer, 
   createHeatmapLayer,
   mapPresets 
-} from './utils/config.ts';
+} from './utils/config';
 
 // Component exports for advanced usage
 export { LayerRenderer } from './components/LayerRenderer';
