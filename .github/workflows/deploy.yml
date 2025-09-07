@@ -1,7 +1,9 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
 
 permissions:
@@ -14,13 +16,13 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -29,15 +31,41 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Run linting
+        run: npm run lint
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+      - name: Run tests
+        run: npm run test:ci
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for production
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_ENVIRONMENT: PROD
+
+      - name: Upload build artifacts
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
   deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -46,4 +74,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3

@@ -194,16 +194,56 @@ Development uses mock data files located in `public/data/`:
 
 ## 🚀 Deployment
 
-### GitHub Pages (Automatic)
+### GitHub Pages (Automatic) 
 
-The project includes a GitHub Actions workflow that automatically deploys to GitHub Pages on push to the main branch.
+The project includes a comprehensive CI/CD pipeline that automatically:
 
-### Manual Deployment
+1. **Tests and validates** code on every push and PR
+2. **Builds** the application for production 
+3. **Deploys** to GitHub Pages when code is pushed to `main`
+
+#### Setup GitHub Pages:
+
+1. Go to your repository settings on GitHub
+2. Navigate to **Pages** section
+3. Select **Source**: `GitHub Actions`
+4. The workflow will automatically deploy on next push to `main`
+
+#### Live URL:
+After deployment, your app will be available at:
+`https://joperafe.github.io/map-tryouts/`
+
+### Workflow Features:
+
+- ✅ **Automated Testing**: Runs linting and tests before deployment  
+- ✅ **Type Safety**: TypeScript compilation checks
+- ✅ **Environment Variables**: Production environment configuration
+- ✅ **Build Optimization**: Vite production optimizations
+- ✅ **SPA Support**: Proper routing for single-page applications
+
+### Manual Deployment (Alternative)
 
 ```bash
+# Build for production
 npm run build
+
+# Deploy using gh-pages (if needed)
 npm run deploy
 ```
+
+### Environment Configuration
+
+The build process automatically uses:
+- `NODE_ENV=production` 
+- `VITE_ENVIRONMENT=PROD`
+- Base path configured for GitHub Pages (`/map-tryouts/`)
+
+### Troubleshooting Deployment
+
+1. **404 Errors**: Ensure GitHub Pages is configured to use GitHub Actions as source
+2. **Build Failures**: Check GitHub Actions logs in the **Actions** tab
+3. **Routing Issues**: The SPA redirect script handles client-side routing
+4. **API Issues**: Verify production API endpoints in environment settings
 
 ## 🌐 Internationalization
 

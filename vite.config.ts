@@ -4,6 +4,7 @@ import { localeFormatter } from './src/plugins/locale-formatter'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/map-tryouts/' : '/',
   plugins: [
     react(),
     localeFormatter({
