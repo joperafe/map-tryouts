@@ -18,6 +18,29 @@ if (buildTime) {
   console.log(`%c🏷️ Commit:`, 'font-weight: bold; color: #666;', buildCommit || 'unknown')
   console.log(`%c🌍 Environment:`, 'font-weight: bold; color: #666;', buildEnv || 'unknown')
   console.log(`%c────────────────────────────────────────`, 'color: #ccc;')
+  
+  // Also add a visible indicator on the page
+  const buildInfo = document.createElement('div')
+  buildInfo.id = 'build-info'
+  buildInfo.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
+    z-index: 10000;
+    opacity: 0.7;
+  `
+  buildInfo.innerHTML = `
+    🏗️ Build: ${new Date(buildTime).toLocaleString()}<br>
+    🌳 Branch: ${buildBranch}<br>
+    🌍 Env: ${buildEnv}
+  `
+  document.body.appendChild(buildInfo)
 }
 
 createRoot(rootElement).render(
