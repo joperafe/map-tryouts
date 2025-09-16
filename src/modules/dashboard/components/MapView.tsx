@@ -327,7 +327,7 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Mode indicator banner */}
       {(drawingMode || measurementMode) && (
         <div 
-          className={`absolute z-[1000] bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 ${
+          className={`absolute z-[10] bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 ${
             Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
               ? 'right-4' 
               : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
@@ -506,7 +506,7 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Drawing Mode Indicator */}
       {drawingMode && (
         <div 
-          className={`absolute z-[1000] bg-blue-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
+          className={`absolute z-[10] bg-blue-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
           style={{
             top: 'auto',
             bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
@@ -535,7 +535,7 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Measurement Mode Indicator */}
       {measurementMode && (
         <div 
-          className={`absolute z-[1000] bg-green-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
+          className={`absolute z-[10] bg-green-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
           style={{
             top: '4rem',
             bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
@@ -572,7 +572,7 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Layer Toggle Panel */}
       {showLayerPanel && (
         <div 
-          className={`absolute z-[1000] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-xs ${
+          className={`absolute z-[10] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-xs ${
             Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') ? 'right-4' : 'left-4'
           }`}
           style={{

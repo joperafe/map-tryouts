@@ -25,7 +25,7 @@ export const MapControls: React.FC<MapControlsProps> = ({ config, theme }) => {
 
   return (
     <div 
-      className={`absolute z-[1000] flex flex-col gap-2 ${positionClasses[config.position || 'top-right']}`}
+      className={`absolute z-[10] flex flex-col gap-2 ${positionClasses[config.position || 'top-right']}`}
       style={{ gap: config.spacing || 8 }}
     >
       {config.showZoom && (
