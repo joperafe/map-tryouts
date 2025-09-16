@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AppConfig } from '../../../types';
 
 interface MapControlsProps {
@@ -14,6 +15,8 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
   onControlClick,
   activeControls = new Set(),
 }, ref) => {
+  const { t: localize } = useTranslation();
+  
   // Get the primary toolbar (assuming first one for now)
   const primaryToolbar = Object.values(mapControls)[0];
   
@@ -40,6 +43,9 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
         .filter(controlType => controlsSettings[controlType]?.enabled)
         .map(controlType => {
           const control = controlsSettings[controlType];
+          const translatedLabel = control.label ? localize(control.label) : controlType;
+          const translatedTooltip = control.tooltip ? localize(control.tooltip) : translatedLabel;
+          
           return (
             <button
               key={controlType}
@@ -49,12 +55,12 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
                   : ''
               }`}
               onClick={() => onControlClick(controlType)}
-              title={control.tooltip || control.label || controlType}
+              title={translatedTooltip}
             >
               <span className="text-lg">{control.icon || '⚙️'}</span>
               {control.label && (
                 <span className="ml-2 text-sm hidden md:inline">
-                  {control.label}
+                  {translatedLabel}
                 </span>
               )}
             </button>

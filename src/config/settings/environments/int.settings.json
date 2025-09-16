@@ -15,33 +15,33 @@
     "controls_settings": {
       "layer_toggle": { 
         "enabled": true, 
-        "label": "Layers", 
+        "label": "DASHBOARD_MAP_CONTROLS_LAYERS", 
         "icon": "🗂️",
-        "tooltip": "Toggle map layers"
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_LAYERS"
       },
       "add_sensor": { 
         "enabled": true, 
-        "label": "Add Sensor", 
+        "label": "DASHBOARD_MAP_CONTROLS_ADD_SENSOR", 
         "icon": "📍",
-        "tooltip": "Add new sensor to map"
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_ADD_SENSOR"
       },
       "draw": { 
         "enabled": false, 
-        "label": "Draw", 
+        "label": "DASHBOARD_MAP_CONTROLS_DRAW", 
         "icon": "✏️",
-        "tooltip": "Draw shapes on map"
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_DRAW"
       },
       "fullscreen": { 
         "enabled": true, 
-        "label": "Fullscreen", 
+        "label": "DASHBOARD_MAP_CONTROLS_FULLSCREEN", 
         "icon": "⛶",
-        "tooltip": "Toggle fullscreen mode"
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_FULLSCREEN"
       },
       "measurement": { 
         "enabled": false, 
-        "label": "Measure", 
+        "label": "DASHBOARD_MAP_CONTROLS_MEASURE", 
         "icon": "📏",
-        "tooltip": "Measure distances"
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_MEASURE"
       }
     },
     "map_controls": {
