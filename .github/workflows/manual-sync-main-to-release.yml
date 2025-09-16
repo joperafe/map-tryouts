@@ -1,0 +1,100 @@
+name: Manual sync main to release
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_merge:
+        description: 'Force merge even if conflicts exist (creates conflict resolution commit)'
+        required: false
+        default: false
+        type: boolean
+      skip_tests:
+        description: 'Skip running tests and linting (not recommended)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  manual-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        if: ${{ !inputs.skip_tests }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: ${{ !inputs.skip_tests }}
+        run: npm ci
+
+      - name: Run tests and linting
+        if: ${{ !inputs.skip_tests }}
+        run: |
+          echo "🧪 Running tests and linting..."
+          npm run test:ci
+          npm run lint
+          npm run build
+          echo "✅ All quality checks passed"
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action (Manual)"
+
+      - name: Sync main to release
+        run: |
+          git checkout release
+          git fetch origin main
+          
+          echo "📊 Checking status between main and release..."
+          
+          # Check if release is behind main
+          BEHIND_COUNT=$(git rev-list --count release..origin/main)
+          AHEAD_COUNT=$(git rev-list --count origin/main..release)
+          
+          echo "📈 Release is $BEHIND_COUNT commits behind main"
+          echo "📉 Release is $AHEAD_COUNT commits ahead of main"
+          
+          if [ "$BEHIND_COUNT" -eq 0 ]; then
+            echo "✅ Release is already up to date with main"
+            exit 0
+          fi
+          
+          echo "🔄 Attempting to merge main into release..."
+          
+          if [ "${{ inputs.force_merge }}" = "true" ]; then
+            echo "⚠️ Force merge enabled - will attempt merge even with conflicts"
+            git merge origin/main --no-ff -m "chore: manual sync main to release (force merge)
+
+            Force merged $BEHIND_COUNT commits from main to release
+            
+            🔧 Manually triggered by: ${{ github.actor }}
+            ⚠️ Force merge was enabled" || {
+              echo "❌ Force merge failed - manual resolution required"
+              exit 1
+            }
+          else
+            git merge origin/main --no-ff -m "chore: manual sync main to release
+
+            Merged $BEHIND_COUNT commits from main to release
+            
+            🔧 Manually triggered by: ${{ github.actor }}
+            ✅ Tests and linting: ${{ inputs.skip_tests && 'Skipped' || 'Passed' }}"
+          fi
+          
+          git push origin release
+          
+          echo "🎉 Successfully synced main to release!"
+          echo "📦 Pushed $(git rev-list --count HEAD~1..HEAD) new commit(s) to release"
