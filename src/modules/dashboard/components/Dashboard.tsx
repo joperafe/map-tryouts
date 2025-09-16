@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
@@ -7,6 +7,7 @@ import { getConfig } from '../../../config';
 
 export const Dashboard: React.FC = () => {
   const config = getConfig();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { sensors, loading: sensorsLoading, error: sensorsError, refetch: refetchSensors } = useSensors();
   const { greenZones, loading: greenZonesLoading, error: greenZonesError, refetch: refetchGreenZones } = useGreenZones();
 
@@ -52,8 +53,170 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navigation />
-      <div className="h-full flex">
-        {/* Sidebar */}
+      
+      {/* Mobile layout */}
+      <div className="md:hidden">
+        {/* Mobile Header with Toggle */}
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                Climate Dashboard
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Environmental monitoring
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {sidebarOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-50 flex">
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-50"
+              onClick={() => setSidebarOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setSidebarOpen(false);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Close sidebar"
+            />
+            <aside className="relative bg-white dark:bg-gray-800 w-80 max-w-[85vw] shadow-xl overflow-y-auto">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Dashboard Info
+                  </h2>
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    aria-label="Close sidebar"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Mobile Sidebar Content */}
+                <div className="space-y-6">
+                  {/* Sensors Summary */}
+                  <section>
+                    <h3 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-3">
+                      Sensors ({sensors.length})
+                    </h3>
+                    <ul className="space-y-2">
+                      {sensors.slice(0, 5).map(sensor => (
+                        <li
+                          key={sensor.id}
+                          className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                        >
+                          <div>
+                            <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                              {sensor.name}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                              {sensor.data.temperature.toFixed(1)}°C
+                            </div>
+                          </div>
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              sensor.status === 'active' ? 'bg-green-500' : 'bg-red-500'
+                            }`}
+                            aria-label={`Sensor ${sensor.name} is ${sensor.status}`}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  {/* Green Zones Summary */}
+                  {config.environment.FEATURES.enableGreenZones && (
+                    <section>
+                      <h3 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-3">
+                        Green Zones ({greenZones.length})
+                      </h3>
+                      <ul className="space-y-2">
+                        {greenZones.slice(0, 3).map(zone => (
+                          <li
+                            key={zone.id}
+                            className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                          >
+                            <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                              {zone.name}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-400">
+                              {zone.type.replace('_', ' ')} • {(zone.area / 1000).toFixed(1)}k m²
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+
+                  {/* Stats */}
+                  <section className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h3 className="sr-only">Sensor Statistics</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-500">
+                          {sensors.filter(s => s.status === 'active').length}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          Active
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-red-500">
+                          {sensors.filter(s => s.status === 'inactive').length}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          Offline
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </aside>
+          </div>
+        )}
+
+        {/* Mobile Map */}
+        <main className="h-[calc(100vh-theme(spacing.16))]" role="main" aria-label="Interactive map">
+          <MapView
+            sensors={sensors}
+            greenZones={greenZones}
+            mapConfig={config.environment.MAP}
+            showSensors={true}
+            showGreenZones={config.environment.FEATURES.enableGreenZones}
+          />
+        </main>
+      </div>
+
+      {/* Desktop layout */}
+      <div className="hidden md:flex h-full">
+        {/* Desktop Sidebar */}
         <aside className="sidebar" role="complementary" aria-label="Dashboard information">
           <header className="sidebar-header">
             <div className="flex items-center justify-between">
@@ -160,7 +323,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </aside>
 
-        {/* Main Content - Map */}
+        {/* Desktop Main Content - Map */}
         <main className="flex-1 relative" role="main" aria-label="Interactive map">
           <MapView
             sensors={sensors}
