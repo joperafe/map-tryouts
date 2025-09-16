@@ -18,16 +18,33 @@ export interface EnvironmentConfig {
  * Detect environment from URL parameters or fallback to build-time environment
  */
 export function detectRuntimeEnvironment(): RuntimeEnvironment {
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined') {
+    console.log('🔍 Server-side render, using build environment');
+    const buildEnv = import.meta.env.VITE_ENVIRONMENT;
+    return (buildEnv as RuntimeEnvironment) || 'PROD';
+  }
+
   // Check URL parameters first
-  const urlParams = new URLSearchParams(window.location.search);
-  const envParam = urlParams.get('env')?.toUpperCase();
+  const searchParams = window.location.search;
+  console.log('🔍 Full URL:', window.location.href);
+  console.log('🔍 Search params:', searchParams);
   
-  if (envParam === 'DEV' || envParam === 'STAGING') {
-    return envParam as RuntimeEnvironment;
+  const urlParams = new URLSearchParams(searchParams);
+  const envParam = urlParams.get('env');
+  
+  console.log('🔍 Raw env param:', envParam);
+  console.log('🔍 Uppercased env param:', envParam?.toUpperCase());
+  
+  if (envParam && (envParam.toUpperCase() === 'DEV' || envParam.toUpperCase() === 'STAGING')) {
+    console.log('✅ Using URL environment:', envParam.toUpperCase());
+    return envParam.toUpperCase() as RuntimeEnvironment;
   }
   
   // Fallback to build-time environment
   const buildEnv = import.meta.env.VITE_ENVIRONMENT;
+  console.log('🔍 Build environment:', buildEnv);
+  console.log('✅ Using build environment:', (buildEnv as RuntimeEnvironment) || 'PROD');
   return (buildEnv as RuntimeEnvironment) || 'PROD';
 }
 
