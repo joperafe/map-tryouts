@@ -43,26 +43,42 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
   const allControlItems = primaryToolbar?.elements.flatMap(element => element.items) || [];
 
   return (
-    <div ref={ref} className={`map-controls ${getPositionClasses()}`}>
+    <section 
+      ref={ref} 
+      className={`map-controls ${getPositionClasses()}`}
+      role="toolbar"
+      aria-label={localize('MAP_CONTROLS_ARIA_LABEL') || 'Map controls'}
+    >
       {allControlItems
         .filter(controlType => controlsSettings[controlType]?.enabled)
-        .map(controlType => {
+        .map((controlType) => {
           const control = controlsSettings[controlType];
           const translatedLabel = control.label ? localize(control.label) : controlType;
           const translatedTooltip = control.tooltip ? localize(control.tooltip) : translatedLabel;
+          const isActive = activeControls.has(controlType);
           
           return (
             <button
               key={controlType}
-              className={`map-control-button ${
-                activeControls.has(controlType) 
-                  ? 'bg-primary-500 text-white border-primary-500' 
-                  : ''
+              type="button"
+              className={`map-control-button focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                isActive 
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-lg' 
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
               onClick={() => onControlClick(controlType)}
+              aria-label={translatedTooltip}
+              aria-pressed={isActive}
+              tabIndex={0}
               title={translatedTooltip}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onControlClick(controlType);
+                }
+              }}
             >
-              <span className="text-lg">{control.icon || '⚙️'}</span>
+              <span className="text-lg" aria-hidden="true">{control.icon || '⚙️'}</span>
               {control.label && shouldDisplayLabels && (
                 <span className="ml-2 text-sm hidden md:inline">
                   {translatedLabel}
@@ -71,6 +87,6 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
             </button>
           );
         })}
-    </div>
+    </section>
   );
 });

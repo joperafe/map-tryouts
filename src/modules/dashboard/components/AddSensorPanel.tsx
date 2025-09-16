@@ -227,33 +227,43 @@ export const AddSensorPanel: React.FC<AddSensorPanelProps> = ({
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label 
+                      htmlFor="sensor-name-input"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    >
                       Sensor Name
                     </label>
                     <input
+                      id="sensor-name-input"
                       type="text"
                       value={sensorName}
                       onChange={(e) => setSensorName(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       placeholder="Enter sensor name"
+                      aria-describedby="sensor-name-help"
+                      required
                     />
+                    <p id="sensor-name-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Choose a descriptive name for this sensor
+                    </p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <fieldset>
+                    <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Capabilities
-                    </label>
-                    <div className="flex flex-wrap gap-2">
+                    </legend>
+                    <div className="flex flex-wrap gap-2" role="list">
                       {selectedSensorType.capabilities.map((capability, index) => (
                         <span
                           key={index}
                           className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm rounded-full"
+                          role="listitem"
                         >
                           {capability}
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
                 </div>
               </div>
             )}

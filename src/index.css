@@ -19,6 +19,39 @@
   #root {
     @apply h-full;
   }
+
+  /* Screen reader only text */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  
+  /* Show screen reader text on focus */
+  .sr-only.focus\:not-sr-only:focus {
+    @apply static w-auto h-auto p-1 m-0 overflow-visible whitespace-normal;
+    clip: auto;
+  }
+
+  /* Global focus styles */
+  *:focus {
+    @apply outline-none;
+  }
+  
+  /* High contrast focus indicators */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
+  }
+  
+  /* Ensure minimum contrast ratios */
+  .text-gray-500 {
+    @apply text-gray-600 dark:text-gray-300;
+  }
 }
 
 /* Custom components */
