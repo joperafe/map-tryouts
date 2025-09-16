@@ -6,11 +6,30 @@ import CockpitPage from './pages/CockpitPage';
 import './i18n';
 
 function App() {
-  const basename = import.meta.env.PROD ? '/map-tryouts' : '';
+  // Dynamic basename based on environment
+  const getBasename = () => {
+    if (!import.meta.env.PROD) return ''; // Development - no basename
+    
+    const environment = import.meta.env.VITE_ENVIRONMENT;
+    
+    if (environment === 'DEV') {
+      // release branch → staging environment
+      return '/map-tryouts/staging';
+    } else if (environment === 'PROD') {
+      // main branch → production environment
+      return '/map-tryouts';
+    }
+    
+    // Fallback for production builds
+    return '/map-tryouts';
+  };
+
+  const basename = getBasename();
   
-  console.log('🚀 App starting with basename:', basename, 'isProd:', import.meta.env.PROD);
-  console.log('🌍 Current location:', window.location.href);
-  console.log('📍 Current pathname:', window.location.pathname);
+  console.log('🚀 App starting with basename:', basename);
+  console.log('🌍 Environment:', import.meta.env.VITE_ENVIRONMENT);
+  console.log('📍 Current location:', window.location.href);
+  console.log('� Current pathname:', window.location.pathname);
   
   return (
     <ThemeProvider>
