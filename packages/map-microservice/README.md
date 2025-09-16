@@ -33,6 +33,7 @@ yarn add react react-dom leaflet react-leaflet leaflet-draw
 
 ## Quick Start
 
+{% raw %}
 ```tsx
 import React from 'react';
 import { InteractiveMap, createMapConfig } from '@climate-app/map-microservice';
@@ -62,6 +63,7 @@ function App() {
 
 export default App;
 ```
+{% endraw %}
 
 ## Configuration
 
@@ -211,11 +213,12 @@ const heatmapLayer = createHeatmapLayer(
 
 Handle map interactions with event callbacks:
 
+{% raw %}
 ```tsx
 <InteractiveMap
   config={mapConfig}
   layers={layers}
-  events={{% raw %}{
+  events={{
     onMapClick: (event) => {
       console.log('Map clicked at:', event.latlng);
     },
@@ -225,14 +228,13 @@ Handle map interactions with event callbacks:
     onDrawCreated: (shape) => {
       console.log('Shape created:', shape);
     }
-  }{% endraw %}}
+  }}
   onMapReady={(map) => {
     console.log('Map is ready:', map);
   }}
 />
-      console.log('Shape drawn:', shape);
-    },
-    onMeasurement: (result) => {
+```
+{% endraw %}
       console.log('Measurement result:', result);
     }
   }}
