@@ -40,7 +40,8 @@ if (buildTime) {
     🌳 Branch: ${buildBranch}<br>
     🌍 Env: ${buildEnv}
   `
-  document.body.appendChild(buildInfo)
+  const debug = false;
+  if (debug) document.body.appendChild(buildInfo)
 }
 
 createRoot(rootElement).render(
