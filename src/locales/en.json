@@ -58,6 +58,8 @@
   "GREEN_ZONES_TYPES_NATURE_RESERVE": "Nature Reserve",
   "GREEN_ZONES_TYPES_URBAN_PARK": "Urban Park",
 
+  "MAP_CONTROLS_ARIA_LABEL": "Map controls",
+
   "NAVIGATION_CLIMATE_DASHBOARD": "Climate Dashboard",
   "NAVIGATION_COCKPIT": "Cockpit",
   "NAVIGATION_DASHBOARD": "Dashboard",
