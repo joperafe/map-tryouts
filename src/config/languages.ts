@@ -1,25 +1,27 @@
-import { getDefaultConfig } from './settings';
+import { getCurrentConfig } from './settings';
 
 export interface Language {
   code: string;
   name: string;
   flag: string;
-  nativeName?: string;
+  nativeName: string;
 }
 
 let _supportedLanguages: Language[] | null = null;
 let _defaultLanguage: string | null = null;
 
 export const getSupportedLanguages = (): Language[] => {
-  if (_supportedLanguages === null) {
-    _supportedLanguages = getDefaultConfig().languages.supported;
+  if (!_supportedLanguages) {
+    const config = getCurrentConfig();
+    _supportedLanguages = config.LANGUAGES?.supported || [];
   }
   return _supportedLanguages;
 };
 
 export const getDefaultLanguage = (): string => {
-  if (_defaultLanguage === null) {
-    _defaultLanguage = getDefaultConfig().languages.default;
+  if (!_defaultLanguage) {
+    const config = getCurrentConfig();
+    _defaultLanguage = config.LANGUAGES?.default || 'en';
   }
   return _defaultLanguage;
 };

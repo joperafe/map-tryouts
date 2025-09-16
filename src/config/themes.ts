@@ -1,11 +1,10 @@
-import { getDefaultConfig } from './settings';
+import { getCurrentConfig } from './settings';
 
 export type Theme = 'light' | 'dark' | 'auto';
 
-const config = getDefaultConfig();
-
-export const supportedThemes: Theme[] = config.themes.supported as Theme[];
-export const defaultTheme: Theme = config.themes.default as Theme;
+const config = getCurrentConfig();
+export const supportedThemes: Theme[] = (config.THEMES?.supported || ['light', 'dark', 'auto']) as Theme[];
+export const defaultTheme: Theme = (config.THEMES?.default || 'auto') as Theme;
 
 export const getThemeByName = (name: string): Theme | undefined => {
   return supportedThemes.find(theme => theme === name);

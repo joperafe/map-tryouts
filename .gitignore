@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 coverage/
+
+# Generated configuration files (built at runtime)
+**/active.settings.json
+public/active.settings.json
+src/config/settings/active.settings.json

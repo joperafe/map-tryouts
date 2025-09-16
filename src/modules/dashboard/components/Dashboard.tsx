@@ -104,7 +104,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Green Zones Summary */}
-          {config.environment.features.enableGreenZones && (
+          {config.environment.FEATURES.enableGreenZones && (
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 Green Zones ({greenZones.length})
@@ -161,9 +161,9 @@ export const Dashboard: React.FC = () => {
         <MapView
           sensors={sensors}
           greenZones={greenZones}
-          mapConfig={config.environment.map}
+          mapConfig={config.environment.MAP}
           showSensors={true}
-          showGreenZones={config.environment.features.enableGreenZones}
+          showGreenZones={config.environment.FEATURES.enableGreenZones}
         />
       </div>
       </div>

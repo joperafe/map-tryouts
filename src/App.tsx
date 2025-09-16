@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Dashboard } from './modules/dashboard';
 import { ThemeProvider } from './contexts/ThemeContext';
 import WiFiCoveragePage from './pages/WiFiPage';
+import CockpitPage from './pages/CockpitPage';
 import './i18n';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/cockpit" element={<CockpitPage />} />
             <Route path="/wifi" element={<WiFiCoveragePage />} />
             <Route path="*" element={
               <div className="flex items-center justify-center h-full">

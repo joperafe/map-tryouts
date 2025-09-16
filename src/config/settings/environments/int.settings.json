@@ -1,0 +1,73 @@
+{
+  "ENVIRONMENT": "INT",
+  "API": {
+    "baseUrl": "/data"
+  },
+  "DATA": {
+    "sensors": "/data/sensors.mock.json",
+    "greenzones": "/data/greenzones.mock.json"
+  },
+  "FEATURES": {
+    "enableHeatmap": true,
+    "enableGreenZones": false
+  },
+  "MAP": {
+    "controls_settings": {
+      "layer_toggle": { 
+        "enabled": true, 
+        "label": "Layers", 
+        "icon": "🗂️",
+        "tooltip": "Toggle map layers"
+      },
+      "add_sensor": { 
+        "enabled": true, 
+        "label": "Add Sensor", 
+        "icon": "📍",
+        "tooltip": "Add new sensor to map"
+      },
+      "draw": { 
+        "enabled": false, 
+        "label": "Draw", 
+        "icon": "✏️",
+        "tooltip": "Draw shapes on map"
+      },
+      "fullscreen": { 
+        "enabled": true, 
+        "label": "Fullscreen", 
+        "icon": "⛶",
+        "tooltip": "Toggle fullscreen mode"
+      },
+      "measurement": { 
+        "enabled": false, 
+        "label": "Measure", 
+        "icon": "📏",
+        "tooltip": "Measure distances"
+      }
+    },
+    "map_controls": {
+      "primary_toolbar": {
+        "position": "topright",
+        "elements": [
+          {
+            "type": "toggle",
+            "items": ["layer_toggle"]
+          },
+          {
+            "type": "switch",
+            "items": ["add_sensor"]
+          },
+          {
+            "type": "toggle",
+            "items": ["fullscreen"]
+          }
+        ]
+      }
+    },
+    "map_settings": {
+      "center": [41.1579, -8.6291],
+      "zoom": 13,
+      "maxZoom": 18,
+      "minZoom": 5
+    }
+  }
+}

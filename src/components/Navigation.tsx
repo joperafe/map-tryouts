@@ -10,6 +10,7 @@ export const Navigation: React.FC = () => {
 
   const navItems = [
     { path: '/dashboard', label: t('NAVIGATION_CLIMATE_DASHBOARD'), icon: '🌡️' },
+    { path: '/cockpit', label: t('NAVIGATION_COCKPIT'), icon: '🚁' },
     { path: '/wifi', label: t('NAVIGATION_WIFI_COVERAGE'), icon: '📶' }
   ];
 

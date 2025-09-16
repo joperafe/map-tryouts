@@ -29,29 +29,56 @@ export interface MapConfig {
 }
 
 export interface AppConfig {
-  environment: 'DEV' | 'INT' | 'PROD';
-  api: {
+  ENVIRONMENT: 'DEV' | 'INT' | 'PROD';
+  API: {
     baseUrl: string;
   };
-  data: {
+  DATA: {
     sensors: string;
     greenzones: string;
   };
-  features: {
+  FEATURES: {
     enableHeatmap: boolean;
     enableGreenZones: boolean;
   };
-  mapControls: {
-    position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
-    controls: MapControlConfig[];
+  MAP: {
+    controls_settings: Record<string, MapControlSetting>;
+    map_controls: Record<string, MapControlLayout>;
+    map_settings: {
+      center: number[]; // Will be exactly 2 numbers [lat, lng]
+      zoom: number;
+      maxZoom: number;
+      minZoom: number;
+      scrollWheelZoom?: boolean;
+      doubleClickZoom?: boolean;
+      boxZoom?: boolean;
+      keyboard?: boolean;
+    };
+    default_tile_layer?: string;
+    default_attribution?: string;
+    tile_layers?: Record<string, {
+      name: string;
+      url: string;
+      attribution: string;
+    }>;
   };
-  map: MapConfig;
 }
 
-export interface MapControlConfig {
-  type: 'layerToggle' | 'draw' | 'fullscreen' | 'measurement';
+export interface MapControlSetting {
   enabled: boolean;
-  label?: string;
+  label: string;
+  icon?: string;
+  tooltip?: string;
+}
+
+export interface MapControlLayout {
+  position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
+  elements: MapControlElement[];
+}
+
+export interface MapControlElement {
+  type: 'toggle' | 'switch';
+  items: string[];
 }
 
 export interface APIResponse<T> {
@@ -71,8 +98,8 @@ export type Language = 'en' | 'pt';
 export type SensorStatus = Sensor['status'];
 export type SensorData = Sensor['data'];
 export type GreenZoneType = GreenZone['type'];
-export type MapControlType = MapControlConfig['type'];
-export type Environment = AppConfig['environment'];
+export type MapControlType = keyof AppConfig['MAP']['controls_settings'];
+export type Environment = AppConfig['ENVIRONMENT'];
 
 // Error types
 export interface AppError {

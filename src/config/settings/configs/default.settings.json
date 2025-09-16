@@ -1,17 +1,16 @@
 {
   "APPLICATION": {
-    "name": "Climate Data Visualization Dashboard",
+    "name": "Climate Data Dashboard",
     "version": "1.0.0",
-    "description": "A comprehensive environmental monitoring system",
+    "description": "Interactive climate monitoring and sensor management dashboard",
     "author": "Climate Team",
-    "license": "MIT"
+    "homepage": "/"
   },
   "BRANDING": {
-    "logo": "/assets/logo.svg",
-    "favicon": "/assets/favicon.ico",
-    "primaryColor": "#3B82F6",
-    "secondaryColor": "#10B981",
-    "accentColor": "#F59E0B"
+    "logo": "/logo.svg",
+    "favicon": "/favicon.ico",
+    "title": "Climate Dashboard",
+    "tagline": "Monitor. Analyze. Protect."
   },
   "LANGUAGES": {
     "supported": [
@@ -34,53 +33,38 @@
     "supported": ["light", "dark", "auto"],
     "default": "auto"
   },
-  "DATE_FORMATS": {
-    "en": "MM/dd/yyyy",
-    "pt": "dd/MM/yyyy"
-  },
-  "NUMBER_FORMATS": {
-    "en": {
-      "decimal": ".",
-      "thousands": ","
-    },
-    "pt": {
-      "decimal": ",",
-      "thousands": " "
-    }
-  },
   "UI": {
-    "itemsPerPage": 10,
-    "animationDuration": 200,
-    "debounceTime": 300,
-    "toast": {
-      "duration": 4000,
-      "position": "top-right"
+    "dateFormats": {
+      "en": "MM/dd/yyyy",
+      "pt": "dd/MM/yyyy"
     },
-    "modal": {
-      "backdropDismiss": true,
-      "escapeKeyClose": true
+    "numberFormats": {
+      "en": {
+        "decimal": ".",
+        "thousands": ","
+      },
+      "pt": {
+        "decimal": ",",
+        "thousands": " "
+      }
     },
-    "table": {
-      "sortable": true,
-      "filterable": true,
-      "exportable": true
+    "pagination": {
+      "itemsPerPage": 10,
+      "showSizeChanger": true,
+      "pageSizeOptions": [5, 10, 20, 50]
+    },
+    "animations": {
+      "duration": 200,
+      "easing": "ease-in-out",
+      "enabled": true
+    },
+    "interactions": {
+      "debounceTime": 300,
+      "tooltipDelay": 500,
+      "doubleClickDelay": 250
     }
   },
   "MAP": {
-    "default_tile_layer": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    "default_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-    "tile_layers": {
-      "openstreetmap": {
-        "name": "OpenStreetMap",
-        "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
-      },
-      "satellite": {
-        "name": "Satellite",
-        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        "attribution": "&copy; Esri"
-      }
-    },
     "controls_settings": {
       "layer_toggle": { 
         "enabled": true, 
@@ -153,40 +137,78 @@
       "doubleClickZoom": true,
       "boxZoom": true,
       "keyboard": true
+    },
+    "default_tile_layer": "openstreetmap",
+    "default_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+    "tile_layers": {
+      "openstreetmap": {
+        "name": "OpenStreetMap",
+        "url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
+      },
+      "satellite": {
+        "name": "Satellite",
+        "url": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        "attribution": "&copy; <a href=\"https://www.opentopomap.org\">OpenTopoMap</a> contributors"
+      }
     }
   },
   "SENSORS": {
-    "refresh_interval": 30000,
-    "alert_thresholds": {
-      "temperature": { "min": -10, "max": 45 },
-      "humidity": { "min": 10, "max": 95 },
-      "air_quality": { "min": 0, "max": 500 },
-      "noise": { "min": 0, "max": 120 }
+    "types": {
+      "temperature": {
+        "name": "Temperature",
+        "unit": "°C",
+        "icon": "🌡️",
+        "color": "#ff6b6b",
+        "range": { "min": -40, "max": 60 }
+      },
+      "humidity": {
+        "name": "Humidity",
+        "unit": "%",
+        "icon": "💧",
+        "color": "#4ecdc4",
+        "range": { "min": 0, "max": 100 }
+      },
+      "pressure": {
+        "name": "Pressure",
+        "unit": "hPa",
+        "icon": "⏲️",
+        "color": "#45b7d1",
+        "range": { "min": 900, "max": 1100 }
+      }
     },
-    "data_retention": {
-      "hours": 24,
-      "days": 7,
-      "months": 12
-    }
+    "alerts": {
+      "temperature": { "min": 0, "max": 35 },
+      "humidity": { "min": 30, "max": 70 },
+      "pressure": { "min": 1000, "max": 1030 }
+    },
+    "refresh_interval": 30000,
+    "max_history_points": 100
   },
   "PERFORMANCE": {
     "cache": {
       "enabled": true,
       "ttl": 300000,
-      "maxSize": 100
+      "max_size": 50
     },
+    "compression": false,
     "lazy_loading": true,
-    "image_optimization": true,
-    "compression": true
+    "debounce": {
+      "search": 300,
+      "resize": 100
+    }
   },
   "SECURITY": {
     "cors": {
-      "enabled": true,
-      "origins": ["localhost", "127.0.0.1"]
+      "enabled": false,
+      "origins": []
     },
     "rate_limiting": {
       "enabled": false,
       "requests_per_minute": 60
+    },
+    "api_keys": {
+      "required": false
     }
   }
 }

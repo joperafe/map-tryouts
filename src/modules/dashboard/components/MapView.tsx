@@ -6,7 +6,10 @@ import { MapControls } from './MapControls';
 import { SensorPopup } from './SensorPopup';
 import { DrawingControls } from './DrawingControls';
 import { MeasurementControls } from './MeasurementControls';
-import type { Sensor, GreenZone, MapConfig } from '../../../types';
+import { AddSensorPanel, type NewSensorData } from './AddSensorPanel';
+import { TempSensorMarker } from './TempSensorMarker';
+import { MapEvents } from './MapEvents';
+import type { Sensor, GreenZone, AppConfig } from '../../../types';
 import { getConfig } from '../../../config';
 import { getAirQualityColor } from '../../../utils';
 
@@ -22,7 +25,7 @@ L.Icon.Default.mergeOptions({
 interface MapViewProps {
   sensors: Sensor[];
   greenZones: GreenZone[];
-  mapConfig: MapConfig;
+  mapConfig: AppConfig['MAP'];
   showSensors?: boolean;
   showGreenZones?: boolean;
 }
@@ -51,8 +54,21 @@ export const MapView: React.FC<MapViewProps> = ({
     area?: number;
     coordinates: L.LatLng[];
   } | null>(null);
+  
+  // Add Sensor functionality
+  const [showAddSensorPanel, setShowAddSensorPanel] = useState(false);
+  const [tempSensors, setTempSensors] = useState<Array<{
+    id: string;
+    name: string;
+    position: [number, number];
+    type: import('./AddSensorPanel').SensorType;
+  }>>([]);
+  const [isSelectingPosition, setIsSelectingPosition] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState<L.LatLng | null>(null);
+  
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapControlsRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
   // Handle ESC key to exit map actions
   useEffect(() => {
@@ -215,9 +231,47 @@ export const MapView: React.FC<MapViewProps> = ({
     });
   };
 
+  // Add Sensor handlers
+  const handleAddSensor = (sensorData: NewSensorData) => {
+    const newSensor = {
+      id: `temp-sensor-${Date.now()}`,
+      name: sensorData.name,
+      position: [sensorData.position.lat, sensorData.position.lng] as [number, number],
+      type: sensorData.type
+    };
+    
+    setTempSensors(prev => [...prev, newSensor]);
+    setSelectedPosition(null);
+    setIsSelectingPosition(false);
+    
+    console.log('New sensor added:', newSensor);
+  };
+
+  const handleRemoveTempSensor = (sensorId: string) => {
+    setTempSensors(prev => prev.filter(sensor => sensor.id !== sensorId));
+    console.log('Temp sensor removed:', sensorId);
+  };
+
+  const handlePositionModeToggle = () => {
+    setIsSelectingPosition(!isSelectingPosition);
+    if (!isSelectingPosition) {
+      setSelectedPosition(null);
+      console.log('Position selection mode enabled - Click on the map to select a position');
+    } else {
+      console.log('Position selection mode disabled');
+    }
+  };
+
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
+    if (isSelectingPosition) {
+      setSelectedPosition(e.latlng);
+      console.log('Position selected:', e.latlng);
+    }
+  };
+
   const handleControlClick = (controlType: string) => {
     switch (controlType) {
-      case 'layerToggle':
+      case 'layer_toggle':
         toggleLayers();
         break;
       case 'draw':
@@ -228,6 +282,9 @@ export const MapView: React.FC<MapViewProps> = ({
         break;
       case 'measurement':
         toggleMeasurement();
+        break;
+      case 'add_sensor':
+        setShowAddSensorPanel(true);
         break;
       default:
         console.warn(`Unknown control type: ${controlType}`);
@@ -271,24 +328,24 @@ export const MapView: React.FC<MapViewProps> = ({
       {(drawingMode || measurementMode) && (
         <div 
           className={`absolute z-[1000] bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 ${
-            config.environment.mapControls.position.includes('right') 
+            Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
               ? 'right-4' 
-              : config.environment.mapControls.position.includes('left') 
+              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
                 ? 'left-4' 
                 : 'left-1/2 transform -translate-x-1/2'
           }`}
           style={{
-            top: config.environment.mapControls.position.includes('top') ? '1rem' : 'auto',
-            bottom: config.environment.mapControls.position.includes('bottom') ? '1rem' : 'auto',
-            right: config.environment.mapControls.position.includes('right') 
+            top: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('top') ? '1rem' : 'auto',
+            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') ? '1rem' : 'auto',
+            right: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
               : 'auto',
-            left: config.environment.mapControls.position.includes('left') 
+            left: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
-              : config.environment.mapControls.position.includes('right') 
+              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
                 ? 'auto' 
                 : '50%',
-            transform: !config.environment.mapControls.position.includes('left') && !config.environment.mapControls.position.includes('right') 
+            transform: !Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') && !Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
               ? 'translateX(-50%)' 
               : 'none'
           }}
@@ -316,21 +373,25 @@ export const MapView: React.FC<MapViewProps> = ({
       )}
 
       <MapContainer
-        center={mapConfig.center}
-        zoom={mapConfig.zoom}
-        className={`h-full w-full z-0 ${drawingMode ? 'drawing-mode' : ''} ${measurementMode ? 'measurement-mode' : ''}`}
+        center={mapConfig.map_settings.center as [number, number]}
+        zoom={mapConfig.map_settings.zoom}
+        className={`h-full w-full z-0 ${drawingMode ? 'drawing-mode' : ''} ${measurementMode ? 'measurement-mode' : ''} ${isSelectingPosition ? 'position-selecting' : ''}`}
         zoomControl={false}
-        style={{ cursor: drawingMode || measurementMode ? 'crosshair' : 'grab' }}
+        style={{ cursor: drawingMode || measurementMode || isSelectingPosition ? 'crosshair' : 'grab' }}
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        {/* Map Events Handler */}
+        <MapEvents onMapClick={handleMapClick} />
+
         {/* Drawing Controls */}
         <DrawingControls
           enabled={drawingMode}
-          position={config.environment.mapControls.position}
+          position={Object.values(config.environment.MAP.map_controls)[0]?.position || "topright"}
           onDrawCreated={handleDrawCreated}
           onDrawDeleted={handleDrawDeleted}
         />
@@ -340,6 +401,41 @@ export const MapView: React.FC<MapViewProps> = ({
           enabled={measurementMode}
           onMeasurement={handleMeasurement}
         />
+        
+        {/* Temporary Sensors (newly added) */}
+        {tempSensors.map(tempSensor => (
+          <TempSensorMarker
+            key={tempSensor.id}
+            id={tempSensor.id}
+            name={tempSensor.name}
+            position={tempSensor.position}
+            type={tempSensor.type}
+            onRemove={handleRemoveTempSensor}
+          />
+        ))}
+
+        {/* Position Selection Marker */}
+        {selectedPosition && isSelectingPosition && (
+          <Marker
+            position={[selectedPosition.lat, selectedPosition.lng]}
+            icon={L.divIcon({
+              html: `
+                <div style="
+                  background: #3B82F6;
+                  border: 3px solid white;
+                  border-radius: 50%;
+                  width: 20px;
+                  height: 20px;
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                  animation: pulse 2s infinite;
+                "></div>
+              `,
+              className: 'position-marker',
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            })}
+          />
+        )}
         
         {/* Sensors */}
         {layersVisible.sensors && sensors.map(sensor => (
@@ -395,14 +491,14 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Map Controls */}
       <MapControls
         ref={mapControlsRef}
-        controls={config.environment.mapControls.controls}
-        position={config.environment.mapControls.position}
+        controlsSettings={config.environment.MAP.controls_settings}
+        mapControls={config.environment.MAP.map_controls}
         onControlClick={handleControlClick}
         activeControls={new Set([
           ...(drawingMode ? ['draw'] : []),
           ...(measurementMode ? ['measurement'] : []),
           ...(isFullscreen ? ['fullscreen'] : []),
-          ...(showLayerPanel ? ['layerToggle'] : []),
+          ...(showLayerPanel ? ['layer_toggle'] : []),
         ])}
       />
 
@@ -412,15 +508,15 @@ export const MapView: React.FC<MapViewProps> = ({
           className={`absolute z-[1000] bg-blue-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
           style={{
             top: 'auto',
-            bottom: config.environment.mapControls.position.includes('bottom') 
+            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
               ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
               : 'auto',
-            right: config.environment.mapControls.position.includes('right') 
+            right: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
               : 'auto',
-            left: config.environment.mapControls.position.includes('left') 
+            left: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
-              : config.environment.mapControls.position.includes('right') 
+              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
                 ? 'auto' 
                 : '1rem',
           }}
@@ -441,17 +537,17 @@ export const MapView: React.FC<MapViewProps> = ({
           className={`absolute z-[1000] bg-green-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
           style={{
             top: '4rem',
-            bottom: config.environment.mapControls.position.includes('bottom') 
+            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
               ? drawingMode 
                 ? 'calc(var(--controls-height, 5rem) + 6rem)' // Stack above drawing indicator
                 : 'calc(var(--controls-height, 5rem) + 0.5rem)'
               : 'auto',
-            right: config.environment.mapControls.position.includes('right') 
+            right: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
               : 'auto',
-            left: config.environment.mapControls.position.includes('left') 
+            left: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
-              : config.environment.mapControls.position.includes('right') 
+              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
                 ? 'auto' 
                 : '1rem',
           }}
@@ -476,13 +572,13 @@ export const MapView: React.FC<MapViewProps> = ({
       {showLayerPanel && (
         <div 
           className={`absolute z-[1000] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-xs ${
-            config.environment.mapControls.position.includes('right') ? 'right-4' : 'left-4'
+            Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') ? 'right-4' : 'left-4'
           }`}
           style={{
-            top: config.environment.mapControls.position.includes('top') 
+            top: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('top') 
               ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
               : 'auto',
-            bottom: config.environment.mapControls.position.includes('bottom') 
+            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
               ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
               : 'auto',
           }}
@@ -519,6 +615,16 @@ export const MapView: React.FC<MapViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Add Sensor Panel */}
+      <AddSensorPanel
+        isOpen={showAddSensorPanel}
+        onClose={() => setShowAddSensorPanel(false)}
+        onAddSensor={handleAddSensor}
+        selectedPosition={selectedPosition}
+        isSelectingPosition={isSelectingPosition}
+        onPositionModeToggle={handlePositionModeToggle}
+      />
     </div>
   );
 };

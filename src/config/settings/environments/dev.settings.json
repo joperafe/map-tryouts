@@ -1,0 +1,57 @@
+{
+  "ENVIRONMENT": "DEV",
+  "API": {
+    "baseUrl": "/data"
+  },
+  "DATA": {
+    "sensors": "/data/sensors.mock.json",
+    "greenzones": "/data/greenzones.mock.json"
+  },
+  "FEATURES": {
+    "enableHeatmap": true,
+    "enableGreenZones": true
+  },
+  "MAP": {
+    "controls_settings": {
+      "draw": { 
+        "enabled": true
+      },
+      "measurement": { 
+        "enabled": true
+      },
+      "export": {
+        "enabled": true
+      }
+    },
+    "map_controls": {
+      "primary_toolbar": {
+        "position": "topright",
+        "elements": [
+          {
+            "type": "toggle",
+            "items": ["layer_toggle"]
+          },
+          {
+            "type": "switch",
+            "items": ["add_sensor", "draw", "measurement"]
+          },
+          {
+            "type": "toggle",
+            "items": ["fullscreen", "export"]
+          }
+        ]
+      }
+    }
+  },
+  "PERFORMANCE": {
+    "cache": {
+      "enabled": false
+    }
+  },
+  "SECURITY": {
+    "cors": {
+      "enabled": true,
+      "origins": ["localhost:3000", "localhost:6000", "127.0.0.1:3000", "127.0.0.1:6000"]
+    }
+  }
+}

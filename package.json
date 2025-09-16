@@ -4,8 +4,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "npm run config:dev && vite",
+    "build": "npm run config:prod && tsc -b && vite build",
+    "build:dev": "npm run config:dev && tsc -b && vite build",
+    "build:int": "npm run config:int && tsc -b && vite build",
+    "build:prod": "npm run config:prod && tsc -b && vite build",
+    "config:dev": "node scripts/build-config.js DEV",
+    "config:int": "node scripts/build-config.js INT", 
+    "config:prod": "node scripts/build-config.js PROD",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
@@ -14,7 +20,7 @@
     "test:ci": "jest --ci --coverage --passWithNoTests",
     "format": "prettier --write .",
     "format:locales": "node scripts/format-locales.js",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build:prod && gh-pages -d dist"
   },
   "dependencies": {
     "@types/leaflet-draw": "^1.0.13",

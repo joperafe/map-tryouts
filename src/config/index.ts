@@ -1,6 +1,7 @@
 import { 
   getEnvironmentSettings, 
-  getDefaultConfig, 
+  getCurrentConfig,
+  getDefaultConfig, // Deprecated, kept for backward compatibility
   getAppConfig, 
   getCurrentEnvironment,
   type Environment 
@@ -16,7 +17,8 @@ export const getConfig = () => getAppConfig();
 
 // Export individual parts for specific use cases (also lazy)
 export const getEnvironmentSettings_ = () => getEnvironmentSettings();
-export const getDefaultConfig_ = () => getDefaultConfig();
+export const getCurrentConfig_ = () => getCurrentConfig();
+export const getDefaultConfig_ = () => getDefaultConfig(); // Deprecated
 
 // Backward compatibility - lazy config object
 let _config: ReturnType<typeof getAppConfig> | null = null;
@@ -34,6 +36,7 @@ export {
   getEnvironment, 
   getCurrentEnvironment,
   getEnvironmentSettings,
-  getDefaultConfig,
+  getCurrentConfig,
+  getDefaultConfig, // Deprecated: Use getCurrentConfig instead
   getAppConfig 
 };

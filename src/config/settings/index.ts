@@ -1,41 +1,105 @@
-import defaultConfig from './configs/default.json';
-import devSettings from './environments/settings.dev.json';
-import intSettings from './environments/settings.int.json';
-import prodSettings from './environments/settings.prod.json';
+// Import the merged active configuration as fallback
+import activeConfigFallback from './active.settings.json';
 
 export type Environment = 'DEV' | 'INT' | 'PROD';
 
+// Cache for runtime configuration
+let runtimeConfig: EnvironmentSettings | null = null;
+let configLoadPromise: Promise<EnvironmentSettings> | null = null;
+
+// Function to load configuration at runtime
+const loadRuntimeConfig = async (): Promise<EnvironmentSettings> => {
+  try {
+    // Determine the correct path based on environment
+    const basePath = import.meta.env.PROD ? '/map-tryouts' : '';
+    const configPath = `${basePath}/active.settings.json`;
+    
+    // Try to fetch from public directory (production/deployed environments)
+    const response = await fetch(configPath);
+    if (response.ok) {
+      const config = await response.json();
+      console.log(`Loaded runtime configuration from ${configPath}`);
+      return config as EnvironmentSettings;
+    }
+  } catch (error) {
+    console.warn('Failed to load runtime configuration, using build-time fallback:', error);
+  }
+  
+  // Fallback to build-time configuration
+  console.log('Using build-time configuration fallback');
+  return activeConfigFallback as EnvironmentSettings;
+};
+
+// Initialize configuration loading
+const initializeConfig = async () => {
+  if (!runtimeConfig) {
+    runtimeConfig = await loadRuntimeConfig();
+  }
+};
+
+// Start loading configuration immediately
+initializeConfig();
+
 export interface EnvironmentSettings {
-  environment: Environment;
-  api: {
+  ENVIRONMENT: Environment;
+  API: {
     baseUrl: string;
   };
-  data: {
+  DATA: {
     sensors: string;
     greenzones: string;
   };
-  features: {
+  FEATURES: {
     enableHeatmap: boolean;
     enableGreenZones: boolean;
   };
-  mapControls: {
-    position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
-    controls: Array<{
-      type: 'layerToggle' | 'draw' | 'fullscreen' | 'measurement';
+  MAP: {
+    controls_settings: Record<string, {
       enabled: boolean;
       label: string;
+      icon?: string;
+      tooltip?: string;
+      shortcut?: string;
+    }>;
+    map_controls: Record<string, {
+      position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
+      elements: Array<{
+        type: 'toggle' | 'switch';
+        items: string[];
+      }>;
+    }>;
+    map_settings: {
+      center: number[]; // Will be exactly 2 numbers [lat, lng]
+      zoom: number;
+      maxZoom: number;
+      minZoom: number;
+      scrollWheelZoom?: boolean;
+      doubleClickZoom?: boolean;
+      boxZoom?: boolean;
+      keyboard?: boolean;
+    };
+    default_tile_layer?: string;
+    default_attribution?: string;
+    tile_layers?: Record<string, {
+      name: string;
+      url: string;
+      attribution: string;
     }>;
   };
-  map: {
-    center: [number, number];
-    zoom: number;
-    maxZoom: number;
-    minZoom: number;
+  APPLICATION?: {
+    name: string;
+    version: string;
+    description: string;
+    author: string;
+    homepage: string;
   };
-}
-
-export interface DefaultConfig {
-  languages: {
+  BRANDING?: {
+    logo: string;
+    favicon: string;
+    title: string;
+    tagline: string;
+  };
+  LANGUAGES?: {
     supported: Array<{
       code: string;
       name: string;
@@ -44,64 +108,111 @@ export interface DefaultConfig {
     }>;
     default: string;
   };
-  themes: {
+  THEMES?: {
     supported: string[];
     default: string;
   };
-  dateFormats: Record<string, string>;
-  numberFormats: Record<string, {
-    decimal: string;
-    thousands: string;
-  }>;
-  ui: {
-    itemsPerPage: number;
-    animationDuration: number;
-    debounceTime: number;
+  UI?: {
+    dateFormats: Record<string, string>;
+    numberFormats: Record<string, { decimal: string; thousands: string }>;
+    pagination: {
+      itemsPerPage: number;
+      showSizeChanger: boolean;
+      pageSizeOptions: number[];
+    };
+    animations: {
+      duration: number;
+      easing: string;
+      enabled: boolean;
+    };
+    interactions: {
+      debounceTime: number;
+      tooltipDelay: number;
+      doubleClickDelay: number;
+    };
   };
-  map: {
-    defaultTileLayer: string;
-    defaultAttribution: string;
+  SENSORS?: {
+    types: Record<string, {
+      name: string;
+      unit: string;
+      icon: string;
+      color: string;
+      range: { min: number; max: number };
+    }>;
+    alerts: Record<string, { min: number; max: number }>;
+    refresh_interval: number;
+    max_history_points: number;
+  };
+  PERFORMANCE?: {
+    cache: {
+      enabled: boolean;
+      ttl?: number;
+      max_size?: number;
+    };
+    compression?: boolean;
+    lazy_loading?: boolean;
+    debounce?: {
+      search: number;
+      resize: number;
+    };
+  };
+  SECURITY?: {
+    cors: {
+      enabled: boolean;
+      origins: string[];
+    };
+    rate_limiting: {
+      enabled: boolean;
+      requests_per_minute: number;
+    };
+  };
+  BUILD_INFO?: {
+    timestamp: string;
+    environment: Environment;
+    version: string;
+    build_id: string;
   };
 }
 
-const environmentSettings: Record<Environment, EnvironmentSettings> = {
-  DEV: devSettings as EnvironmentSettings,
-  INT: intSettings as EnvironmentSettings,
-  PROD: prodSettings as EnvironmentSettings,
-};
-
-export const getEnvironmentSettings = (env?: string): EnvironmentSettings => {
-  // Force DEV environment in development mode
-  let environment: Environment;
-  
-  if (import.meta.env.DEV || import.meta.env.MODE === 'development') {
-    environment = 'DEV';
-  } else {
-    environment = (env || import.meta.env.VITE_ENVIRONMENT || 'DEV') as Environment;
+// Async function to get environment settings (with runtime loading)
+export const getEnvironmentSettingsAsync = async (): Promise<EnvironmentSettings> => {
+  if (!configLoadPromise) {
+    configLoadPromise = loadRuntimeConfig();
   }
   
-  return environmentSettings[environment] || environmentSettings.DEV;
+  if (!runtimeConfig) {
+    runtimeConfig = await configLoadPromise;
+  }
+  
+  return runtimeConfig;
 };
 
-export const getDefaultConfig = (): DefaultConfig => {
-  return defaultConfig;
+// Synchronous function for immediate access (uses fallback if runtime not loaded)
+export const getEnvironmentSettings = (): EnvironmentSettings => {
+  return runtimeConfig || (activeConfigFallback as EnvironmentSettings);
 };
 
 export const getCurrentEnvironment = (): Environment => {
-  // Force DEV environment in development mode
-  if (import.meta.env.DEV) {
-    return 'DEV';
-  }
-  return (import.meta.env.VITE_ENVIRONMENT || 'DEV') as Environment;
+  const config = getEnvironmentSettings();
+  return config.ENVIRONMENT || 'DEV';
 };
 
-// Combined configuration
+// Get the current active configuration (merged default + environment)
+export const getCurrentConfig = () => {
+  return getEnvironmentSettings();
+};
+
+// Deprecated: Use getCurrentConfig() instead - kept for backward compatibility
+export const getDefaultConfig = () => {
+  return getCurrentConfig();
+};
+
+// Combined configuration for backward compatibility
 export const getAppConfig = () => {
   const envSettings = getEnvironmentSettings();
-  const defaultSettings = getDefaultConfig();
   
   return {
     environment: envSettings,
-    config: defaultSettings,
+    config: envSettings, // Now they're the same merged configuration
   };
 };

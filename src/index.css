@@ -66,6 +66,83 @@
   .loading-spinner {
     @apply animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500;
   }
+  
+  /* Sensor Addition Panel */
+  .add-sensor-panel {
+    @apply fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl border-l border-gray-200 dark:border-gray-700 z-[1001] transform transition-transform duration-300 ease-in-out;
+  }
+  
+  .add-sensor-panel.open {
+    @apply translate-x-0;
+  }
+  
+  .add-sensor-panel.closed {
+    @apply translate-x-full;
+  }
+  
+  .sensor-type-button {
+    @apply w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex flex-col items-center justify-center text-xs font-medium;
+  }
+  
+  .sensor-type-button.temperature {
+    @apply from-red-400 to-red-600;
+  }
+  
+  .sensor-type-button.air-quality {
+    @apply from-green-400 to-green-600;
+  }
+  
+  .sensor-type-button.noise {
+    @apply from-purple-400 to-purple-600;
+  }
+  
+  .sensor-type-button.multi {
+    @apply from-orange-400 to-orange-600;
+  }
+  
+  /* Position Selection Animation */
+  .map-selecting-position {
+    cursor: crosshair !important;
+  }
+  
+  .map-selecting-position * {
+    cursor: crosshair !important;
+  }
+  
+  @keyframes pulse-crosshair {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+  
+  .position-selection-overlay {
+    @apply fixed inset-0 bg-blue-500 bg-opacity-10 z-[1000] pointer-events-none;
+    animation: pulse-crosshair 2s infinite;
+  }
+  
+  /* Temporary Sensor Marker */
+  .temp-sensor-marker {
+    @apply w-10 h-10 rounded-full border-4 border-dashed border-blue-500 bg-blue-100 dark:bg-blue-900 shadow-lg flex items-center justify-center text-blue-600 dark:text-blue-300 cursor-pointer;
+    animation: bounce 1s infinite;
+  }
+  
+  .temp-sensor-marker:hover {
+    @apply border-red-500 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+      transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+      transform: translate3d(0,-15px,0);
+    }
+    70% {
+      transform: translate3d(0,-8px,0);
+    }
+    90% {
+      transform: translate3d(0,-3px,0);
+    }
+  }
 }
 
 /* Dark theme overrides for Leaflet */

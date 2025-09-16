@@ -1,21 +1,24 @@
 import React from 'react';
-import type { MapControlConfig } from '../../../types';
+import type { AppConfig } from '../../../types';
 
 interface MapControlsProps {
-  controls: MapControlConfig[];
-  position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
+  controlsSettings: AppConfig['MAP']['controls_settings'];
+  mapControls: AppConfig['MAP']['map_controls'];
   onControlClick: (controlType: string) => void;
   activeControls?: Set<string>;
 }
 
 export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
-  controls,
-  position,
+  controlsSettings,
+  mapControls,
   onControlClick,
   activeControls = new Set(),
 }, ref) => {
+  // Get the primary toolbar (assuming first one for now)
+  const primaryToolbar = Object.values(mapControls)[0];
+  
   const getPositionClasses = () => {
-    switch (position) {
+    switch (primaryToolbar?.position) {
       case 'topleft':
         return 'top-4 left-4';
       case 'bottomleft':
@@ -28,44 +31,35 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
     }
   };
 
-  const getControlIcon = (type: string) => {
-    switch (type) {
-      case 'layerToggle':
-        return '🗂️';
-      case 'draw':
-        return '✏️';
-      case 'fullscreen':
-        return '⛶';
-      case 'measurement':
-        return '📏';
-      default:
-        return '⚙️';
-    }
-  };
+  // Flatten all control items from all elements
+  const allControlItems = primaryToolbar?.elements.flatMap(element => element.items) || [];
 
   return (
     <div ref={ref} className={`map-controls ${getPositionClasses()}`}>
-      {controls
-        .filter(control => control.enabled)
-        .map(control => (
-          <button
-            key={control.type}
-            className={`map-control-button ${
-              activeControls.has(control.type) 
-                ? 'bg-primary-500 text-white border-primary-500' 
-                : ''
-            }`}
-            onClick={() => onControlClick(control.type)}
-            title={control.label || control.type}
-          >
-            <span className="text-lg">{getControlIcon(control.type)}</span>
-            {control.label && (
-              <span className="ml-2 text-sm hidden md:inline">
-                {control.label}
-              </span>
-            )}
-          </button>
-        ))}
+      {allControlItems
+        .filter(controlType => controlsSettings[controlType]?.enabled)
+        .map(controlType => {
+          const control = controlsSettings[controlType];
+          return (
+            <button
+              key={controlType}
+              className={`map-control-button ${
+                activeControls.has(controlType) 
+                  ? 'bg-primary-500 text-white border-primary-500' 
+                  : ''
+              }`}
+              onClick={() => onControlClick(controlType)}
+              title={control.tooltip || control.label || controlType}
+            >
+              <span className="text-lg">{control.icon || '⚙️'}</span>
+              {control.label && (
+                <span className="ml-2 text-sm hidden md:inline">
+                  {control.label}
+                </span>
+              )}
+            </button>
+          );
+        })}
     </div>
   );
 });
