@@ -5,14 +5,17 @@ import Navigation from '../../../components/Navigation';
 import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
 import { useSensors, useGreenZones } from '../hooks';
 import { getConfig } from '../../../config';
-import { getEnvironmentConfig } from '../../../utils/environmentDetector';
+import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 
 export const Dashboard: React.FC = () => {
   const config = getConfig();
-  const runtimeConfig = getEnvironmentConfig();
+  const { environment, config: runtimeConfig } = useRuntimeEnvironment();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { sensors, loading: sensorsLoading, error: sensorsError, refetch: refetchSensors } = useSensors();
   const { greenZones, loading: greenZonesLoading, error: greenZonesError, refetch: refetchGreenZones } = useGreenZones();
+
+  console.log('🎯 Dashboard - Current environment:', environment);
+  console.log('⚙️ Dashboard - Runtime config:', runtimeConfig);
 
   if (sensorsLoading || greenZonesLoading) {
     return (

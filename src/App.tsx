@@ -4,6 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import WiFiCoveragePage from './pages/WiFiPage';
 import CockpitPage from './pages/CockpitPage';
 import { detectRuntimeEnvironment, getEnvironmentConfig } from './utils/environmentDetector';
+import './utils/debugEnvironment'; // Auto-run debug in development
 import './i18n';
 
 function App() {
