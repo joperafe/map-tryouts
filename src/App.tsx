@@ -6,25 +6,8 @@ import CockpitPage from './pages/CockpitPage';
 import './i18n';
 
 function App() {
-  // Dynamic basename based on environment
-  const getBasename = () => {
-    if (!import.meta.env.PROD) return ''; // Development - no basename
-    
-    const environment = import.meta.env.VITE_ENVIRONMENT;
-    
-    if (environment === 'DEV') {
-      // release branch → staging environment
-      return '/map-tryouts/staging';
-    } else if (environment === 'PROD') {
-      // main branch → production environment
-      return '/map-tryouts';
-    }
-    
-    // Fallback for production builds
-    return '/map-tryouts';
-  };
-
-  const basename = getBasename();
+  // Simple basename for production deployment
+  const basename = import.meta.env.PROD ? '/map-tryouts' : '';
   
   console.log('🚀 App starting with basename:', basename);
   console.log('🌍 Environment:', import.meta.env.VITE_ENVIRONMENT);
