@@ -5,7 +5,7 @@ import { buildMetadata } from './src/plugins/build-metadata'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/map-tryouts',
+  base: process.env.NODE_ENV === 'production' ? '/map-tryouts/' : '/',
   plugins: [
     react(),
     localeFormatter({
