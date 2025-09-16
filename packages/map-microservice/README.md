@@ -215,7 +215,7 @@ Handle map interactions with event callbacks:
 <InteractiveMap
   config={mapConfig}
   layers={layers}
-  events={{
+  events={{% raw %}{
     onMapClick: (event) => {
       console.log('Map clicked at:', event.latlng);
     },
@@ -223,6 +223,13 @@ Handle map interactions with event callbacks:
       console.log('Marker clicked:', marker);
     },
     onDrawCreated: (shape) => {
+      console.log('Shape created:', shape);
+    }
+  }{% endraw %}}
+  onMapReady={(map) => {
+    console.log('Map is ready:', map);
+  }}
+/>
       console.log('Shape drawn:', shape);
     },
     onMeasurement: (result) => {
