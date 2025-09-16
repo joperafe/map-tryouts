@@ -33,11 +33,11 @@
           },
           {
             "type": "switch",
-            "items": ["add_sensor"]
+            "items": ["add_sensor", "draw", "measurement"]
           },
           {
             "type": "toggle",
-            "items": ["fullscreen"]
+            "items": ["fullscreen", "export"]
           }
         ]
       }

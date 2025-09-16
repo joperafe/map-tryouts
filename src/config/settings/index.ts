@@ -3,11 +3,13 @@ import activeConfigFallback from './active.settings.json';
 
 export type Environment = 'DEV' | 'INT' | 'PROD';
 
-// Cache for runtime configuration
-let runtimeConfig: EnvironmentSettings | null = null;
-let configLoadPromise: Promise<EnvironmentSettings> | null = null;
+// Use build-time configuration as the primary config for reliability
+const primaryConfig = activeConfigFallback as EnvironmentSettings;
 
-// Function to load configuration at runtime
+// Cache for runtime configuration (optional enhancement)
+let runtimeConfig: EnvironmentSettings | null = null;
+
+// Function to load configuration at runtime (async enhancement)
 const loadRuntimeConfig = async (): Promise<EnvironmentSettings> => {
   try {
     // Determine the correct path based on environment
@@ -18,27 +20,29 @@ const loadRuntimeConfig = async (): Promise<EnvironmentSettings> => {
     const response = await fetch(configPath);
     if (response.ok) {
       const config = await response.json();
-      console.log(`Loaded runtime configuration from ${configPath}`);
+      console.log(`✅ Loaded runtime configuration from ${configPath}`);
       return config as EnvironmentSettings;
     }
   } catch (error) {
-    console.warn('Failed to load runtime configuration, using build-time fallback:', error);
+    console.warn('⚠️ Failed to load runtime configuration, using build-time fallback:', error);
   }
   
   // Fallback to build-time configuration
-  console.log('Using build-time configuration fallback');
-  return activeConfigFallback as EnvironmentSettings;
+  console.log('📦 Using build-time configuration fallback');
+  return primaryConfig;
 };
 
-// Initialize configuration loading
-const initializeConfig = async () => {
-  if (!runtimeConfig) {
+// Initialize configuration loading in background (non-blocking)
+const initializeConfigAsync = async () => {
+  try {
     runtimeConfig = await loadRuntimeConfig();
+  } catch (error) {
+    console.warn('Configuration async loading failed:', error);
   }
 };
 
-// Start loading configuration immediately
-initializeConfig();
+// Start loading configuration in background (non-blocking)
+initializeConfigAsync();
 
 export interface EnvironmentSettings {
   ENVIRONMENT: Environment;
@@ -176,20 +180,16 @@ export interface EnvironmentSettings {
 
 // Async function to get environment settings (with runtime loading)
 export const getEnvironmentSettingsAsync = async (): Promise<EnvironmentSettings> => {
-  if (!configLoadPromise) {
-    configLoadPromise = loadRuntimeConfig();
-  }
-  
   if (!runtimeConfig) {
-    runtimeConfig = await configLoadPromise;
+    runtimeConfig = await loadRuntimeConfig();
   }
   
   return runtimeConfig;
 };
 
-// Synchronous function for immediate access (uses fallback if runtime not loaded)
+// Synchronous function for immediate access (always returns valid config)
 export const getEnvironmentSettings = (): EnvironmentSettings => {
-  return runtimeConfig || (activeConfigFallback as EnvironmentSettings);
+  return runtimeConfig || primaryConfig;
 };
 
 export const getCurrentEnvironment = (): Environment => {
