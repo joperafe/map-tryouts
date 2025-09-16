@@ -6,17 +6,21 @@ import jsxA11y from 'eslint-plugin-jsx-a11y'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config([
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'coverage', 'packages'] },
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
       ...tseslint.configs.recommended,
-      jsxA11y.configs.recommended,
     ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -28,6 +32,8 @@ export default tseslint.config([
         'warn',
         { allowConstantExport: true },
       ],
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       // Accessibility rules

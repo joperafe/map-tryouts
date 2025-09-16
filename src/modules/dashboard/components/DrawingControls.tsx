@@ -139,7 +139,7 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
       map.off(L.Draw.Event.CREATED);
       map.off(L.Draw.Event.DELETED);
     };
-  }, [map, enabled, onDrawCreated, onDrawDeleted]);
+  }, [map, enabled, position, onDrawCreated, onDrawDeleted]);
 
   // Cleanup when component unmounts
   useEffect(() => {

@@ -133,6 +133,14 @@ export const AddSensorPanel: React.FC<AddSensorPanelProps> = ({
       <div 
         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            onClose();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Close sensor panel"
       />
       
       {/* Side Panel */}

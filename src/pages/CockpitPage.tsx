@@ -447,10 +447,10 @@ export const CockpitPage: React.FC = () => {
                       
                       <div className="space-y-6">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label htmlFor="auto-refresh-interval" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Auto-refresh Interval
                           </label>
-                          <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                          <select id="auto-refresh-interval" className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option>30 seconds</option>
                             <option>1 minute</option>
                             <option>5 minutes</option>
@@ -459,30 +459,32 @@ export const CockpitPage: React.FC = () => {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Alert Notifications
-                          </label>
-                          <div className="space-y-2">
-                            <label className="flex items-center">
-                              <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" defaultChecked />
-                              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Email notifications</span>
-                            </label>
-                            <label className="flex items-center">
-                              <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" defaultChecked />
-                              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Browser notifications</span>
-                            </label>
-                            <label className="flex items-center">
-                              <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-                              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">SMS notifications</span>
-                            </label>
-                          </div>
+                          <fieldset>
+                            <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Alert Notifications
+                            </legend>
+                            <div className="space-y-2">
+                              <label className="flex items-center">
+                                <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" defaultChecked />
+                                <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Email notifications</span>
+                              </label>
+                              <label className="flex items-center">
+                                <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" defaultChecked />
+                                <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Browser notifications</span>
+                              </label>
+                              <label className="flex items-center">
+                                <input type="checkbox" className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">SMS notifications</span>
+                              </label>
+                            </div>
+                          </fieldset>
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label htmlFor="command-timeout" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Command Timeout
                           </label>
-                          <select className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                          <select id="command-timeout" className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                             <option>30 seconds</option>
                             <option>1 minute</option>
                             <option>2 minutes</option>
