@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { localeFormatter } from './src/plugins/locale-formatter'
+import { buildMetadata } from './src/plugins/build-metadata'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,6 +11,10 @@ export default defineConfig({
     localeFormatter({
       localesDir: 'src/locales',
       spacing: true
+    }),
+    buildMetadata({
+      element: 'root',
+      dateFormat: 'iso'
     })
   ],
   resolve: {
