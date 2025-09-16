@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
+import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
 import { useSensors, useGreenZones } from '../hooks';
 import { getConfig } from '../../../config';
+import { getEnvironmentConfig } from '../../../utils/environmentDetector';
 
 export const Dashboard: React.FC = () => {
   const config = getConfig();
+  const runtimeConfig = getEnvironmentConfig();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { sensors, loading: sensorsLoading, error: sensorsError, refetch: refetchSensors } = useSensors();
   const { greenZones, loading: greenZonesLoading, error: greenZonesError, refetch: refetchGreenZones } = useGreenZones();
@@ -53,6 +56,9 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navigation />
+      
+      {/* Environment Indicator */}
+      <EnvironmentIndicator />
       
       {/* Mobile layout */}
       <div className="md:hidden">
@@ -209,7 +215,7 @@ export const Dashboard: React.FC = () => {
             greenZones={greenZones}
             mapConfig={config.environment.MAP}
             showSensors={true}
-            showGreenZones={config.environment.FEATURES.enableGreenZones}
+            showGreenZones={runtimeConfig.enableGreenZones}
           />
         </main>
       </div>
@@ -330,7 +336,7 @@ export const Dashboard: React.FC = () => {
             greenZones={greenZones}
             mapConfig={config.environment.MAP}
             showSensors={true}
-            showGreenZones={config.environment.FEATURES.enableGreenZones}
+            showGreenZones={runtimeConfig.enableGreenZones}
           />
         </main>
       </div>

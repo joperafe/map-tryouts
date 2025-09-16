@@ -3,14 +3,19 @@ import { Dashboard } from './modules/dashboard';
 import { ThemeProvider } from './contexts/ThemeContext';
 import WiFiCoveragePage from './pages/WiFiPage';
 import CockpitPage from './pages/CockpitPage';
+import { detectRuntimeEnvironment, getEnvironmentConfig } from './utils/environmentDetector';
 import './i18n';
 
 function App() {
   // Simple basename for production deployment
   const basename = import.meta.env.PROD ? '/map-tryouts' : '';
+  const runtimeEnv = detectRuntimeEnvironment();
+  const envConfig = getEnvironmentConfig();
   
   console.log('🚀 App starting with basename:', basename);
-  console.log('🌍 Environment:', import.meta.env.VITE_ENVIRONMENT);
+  console.log('🌍 Build Environment:', import.meta.env.VITE_ENVIRONMENT);
+  console.log('🎯 Runtime Environment:', runtimeEnv);
+  console.log('⚙️ Environment Config:', envConfig);
   console.log('📍 Current location:', window.location.href);
   console.log('� Current pathname:', window.location.pathname);
   
