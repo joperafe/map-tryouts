@@ -19,8 +19,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,7 +39,6 @@ jobs:
         env:
           NODE_ENV: production
           VITE_ENVIRONMENT: PROD
-          VITE_BASE_URL: /map-tryouts/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
