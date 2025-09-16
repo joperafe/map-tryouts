@@ -53,6 +53,7 @@ export interface AppConfig {
       doubleClickZoom?: boolean;
       boxZoom?: boolean;
       keyboard?: boolean;
+      displayControlLabel?: boolean;
     };
     default_tile_layer?: string;
     default_attribution?: string;

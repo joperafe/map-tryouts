@@ -493,6 +493,7 @@ export const MapView: React.FC<MapViewProps> = ({
         ref={mapControlsRef}
         controlsSettings={config.environment.MAP.controls_settings}
         mapControls={config.environment.MAP.map_controls}
+        mapSettings={config.environment.MAP.map_settings}
         onControlClick={handleControlClick}
         activeControls={new Set([
           ...(drawingMode ? ['draw'] : []),

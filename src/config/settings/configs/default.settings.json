@@ -136,7 +136,8 @@
       "scrollWheelZoom": true,
       "doubleClickZoom": true,
       "boxZoom": true,
-      "keyboard": true
+      "keyboard": true,
+      "displayControlLabel": false
     },
     "default_tile_layer": "openstreetmap",
     "default_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",

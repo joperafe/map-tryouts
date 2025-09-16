@@ -5,6 +5,7 @@ import type { AppConfig } from '../../../types';
 interface MapControlsProps {
   controlsSettings: AppConfig['MAP']['controls_settings'];
   mapControls: AppConfig['MAP']['map_controls'];
+  mapSettings: AppConfig['MAP']['map_settings'];
   onControlClick: (controlType: string) => void;
   activeControls?: Set<string>;
 }
@@ -12,6 +13,7 @@ interface MapControlsProps {
 export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
   controlsSettings,
   mapControls,
+  mapSettings,
   onControlClick,
   activeControls = new Set(),
 }, ref) => {
@@ -19,6 +21,9 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
   
   // Get the primary toolbar (assuming first one for now)
   const primaryToolbar = Object.values(mapControls)[0];
+  
+  // Check if control labels should be displayed
+  const shouldDisplayLabels = mapSettings.displayControlLabel !== false; // Default to true if not specified
   
   const getPositionClasses = () => {
     switch (primaryToolbar?.position) {
@@ -58,7 +63,7 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
               title={translatedTooltip}
             >
               <span className="text-lg">{control.icon || '⚙️'}</span>
-              {control.label && (
+              {control.label && shouldDisplayLabels && (
                 <span className="ml-2 text-sm hidden md:inline">
                   {translatedLabel}
                 </span>
