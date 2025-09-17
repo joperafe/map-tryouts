@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      port: 3000,
+      port: 5000,
       open: true,
     },
     define: {
