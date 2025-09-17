@@ -39,7 +39,7 @@ export function debugEnvironmentDetection() {
 }
 
 // Auto-run debug in development
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV && false) { // Disabled for now to reduce console spam
   // Run after DOM is ready
   if (typeof window !== 'undefined') {
     if (document.readyState === 'loading') {

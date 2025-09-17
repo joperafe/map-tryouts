@@ -20,32 +20,28 @@ export interface EnvironmentConfig {
 export function detectRuntimeEnvironment(): RuntimeEnvironment {
   // Check if we're in a browser environment
   if (typeof window === 'undefined') {
-    console.log('🔍 Server-side render, using build environment');
-    const buildEnv = import.meta.env.VITE_ENVIRONMENT;
+    const buildEnv = import.meta.env.VITE_ENVIRONMENT || 'DEV';
     return (buildEnv as RuntimeEnvironment) || 'PROD';
   }
 
   // Check URL parameters first
   const searchParams = window.location.search;
-  console.log('🔍 Full URL:', window.location.href);
-  console.log('🔍 Search params:', searchParams);
-  
   const urlParams = new URLSearchParams(searchParams);
   const envParam = urlParams.get('env');
   
-  console.log('🔍 Raw env param:', envParam);
-  console.log('🔍 Uppercased env param:', envParam?.toUpperCase());
-  
   if (envParam && (envParam.toUpperCase() === 'DEV' || envParam.toUpperCase() === 'STAGING')) {
-    console.log('✅ Using URL environment:', envParam.toUpperCase());
     return envParam.toUpperCase() as RuntimeEnvironment;
   }
   
   // Fallback to build-time environment
-  const buildEnv = import.meta.env.VITE_ENVIRONMENT;
-  console.log('🔍 Build environment:', buildEnv);
-  console.log('✅ Using build environment:', (buildEnv as RuntimeEnvironment) || 'PROD');
-  return (buildEnv as RuntimeEnvironment) || 'PROD';
+  const buildEnv = import.meta.env.VITE_ENVIRONMENT || import.meta.env.MODE;
+  
+  // Map Vite modes to our environments
+  if (buildEnv === 'development') return 'DEV';
+  if (buildEnv === 'DEV') return 'DEV';
+  if (buildEnv === 'STAGING') return 'STAGING';
+  
+  return 'PROD';
 }
 
 /**

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
@@ -14,8 +14,10 @@ export const Dashboard: React.FC = () => {
   const { sensors, loading: sensorsLoading, error: sensorsError, refetch: refetchSensors } = useSensors();
   const { greenZones, loading: greenZonesLoading, error: greenZonesError, refetch: refetchGreenZones } = useGreenZones();
 
-  console.log('🎯 Dashboard - Current environment:', environment);
-  console.log('⚙️ Dashboard - Runtime config:', runtimeConfig);
+  // Only log once when environment changes
+  useEffect(() => {
+    console.log('🎯 Dashboard - Environment:', environment, 'Config:', runtimeConfig);
+  }, [environment, runtimeConfig]);
 
   if (sensorsLoading || greenZonesLoading) {
     return (
