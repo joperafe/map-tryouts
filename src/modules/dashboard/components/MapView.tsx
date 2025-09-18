@@ -10,10 +10,10 @@ import { AddSensorPanel, type NewSensorData } from './AddSensorPanel';
 import { TempSensorMarker } from './TempSensorMarker';
 import { MapEvents } from './MapEvents';
 import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
-import { useAirQuality } from '../../../hooks/useAirQuality';
+import { useMapData } from '../../../contexts';
+import { useMapSettings } from '../../../hooks';
 import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
-import type { Sensor, GreenZone, AppConfig } from '../../../types';
-import { getConfig } from '../../../config';
+import type { Sensor, AppConfig } from '../../../types';
 import { getAirQualityColor } from '../../../utils';
 
 // Fix for default markers in React-Leaflet
@@ -26,22 +26,29 @@ L.Icon.Default.mergeOptions({
 });
 
 interface MapViewProps {
-  sensors: Sensor[];
-  greenZones: GreenZone[];
   mapConfig: AppConfig['MAP'];
   showSensors?: boolean;
   showGreenZones?: boolean;
 }
 
 export const MapView: React.FC<MapViewProps> = ({
-  sensors,
-  greenZones,
   mapConfig,
   showSensors = true,
   showGreenZones = true,
 }) => {
   const { t } = useTranslation();
-  const config = getConfig();
+  const mapSettings = useMapSettings();
+  
+  // Get data from global context
+  const { 
+    sensors, 
+    greenZones, 
+    airQualityStations, 
+    loading, 
+    errors, 
+    refreshAirQuality
+  } = useMapData();
+  
   const [layersVisible, setLayersVisible] = useState({
     sensors: showSensors,
     greenZones: showGreenZones,
@@ -54,14 +61,6 @@ export const MapView: React.FC<MapViewProps> = ({
   const [showLayerPanel, setShowLayerPanel] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
-  // Air Quality data - load immediately and auto-refresh
-  const {
-    stations: airQualityStations,
-    loading: airQualityLoading,
-    error: airQualityError,
-    lastUpdated: airQualityLastUpdated,
-    refreshData: refreshAirQuality,
-  } = useAirQuality(true, 300000); // Auto-refresh every 5 minutes
   const [drawnItems, setDrawnItems] = useState<L.Layer[]>([]);
   const [measurementResult, setMeasurementResult] = useState<{
     distance?: number;
@@ -375,20 +374,6 @@ export const MapView: React.FC<MapViewProps> = ({
     }
   };
 
-  const formatLastUpdated = (date: Date) => {
-    const now = new Date();
-    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffMinutes < 1) return 'just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
-  };
-
   const getAirQualityLegend = () => {
     const stationCounts = airQualityStations.reduce((acc, station) => {
       acc[station.qualityLevel] = (acc[station.qualityLevel] || 0) + 1;
@@ -402,6 +387,133 @@ export const MapView: React.FC<MapViewProps> = ({
     }));
   };
 
+  // Access data layers from mapSettings
+  const getDataLayers = () => {
+    return mapSettings?.data_layers;
+  };
+
+  // Get layer toggle items from mapSettings
+  const getLayerToggleItems = () => {
+    return mapSettings?.controls_settings.layer_toggle?.items;
+  };
+
+  // Helper to get the first control position (fallback to topright)
+  const getControlPosition = () => {
+    const controls = mapSettings?.map_controls;
+    if (controls) {
+      const firstControl = Object.values(controls)[0];
+      return firstControl?.position || "topright";
+    }
+    return "topright";
+  };
+
+  const getDataForLayer = (layerKey: string) => {
+    const dataMap = {
+      sensors,
+      greenZones,
+      airQualityStations,
+    };
+    return dataMap[layerKey as keyof typeof dataMap] || [];
+  };
+
+  const getLoadingForLayer = (layerKey: string) => {
+    const loadingMap = {
+      sensors: loading.sensors,
+      greenZones: loading.greenZones,
+      airQualityStations: loading.airQuality,
+      airQuality: loading.airQuality,
+    };
+    return loadingMap[layerKey as keyof typeof loadingMap] || false;
+  };
+
+  const getErrorForLayer = (layerKey: string) => {
+    const errorMap = {
+      sensors: errors.sensors,
+      greenZones: errors.greenZones,
+      airQualityStations: errors.airQuality,
+      airQuality: errors.airQuality,
+    };
+    return errorMap[layerKey as keyof typeof errorMap];
+  };
+
+  const getRefreshFunctionForLayer = (layerKey: string) => {
+    const refreshMap = {
+      airQuality: refreshAirQuality,
+      airQualityStations: refreshAirQuality,
+      // Add more refresh functions here as needed
+    };
+    return refreshMap[layerKey as keyof typeof refreshMap];
+  };
+
+  const renderLayerToggle = (layerId: string, layerConfig: import('../../../types').MapDataLayer) => {
+    const isLoading = getLoadingForLayer(layerConfig.count_key || layerId);
+    const error = getErrorForLayer(layerConfig.count_key || layerId);
+    const data = getDataForLayer(layerConfig.count_key || layerId);
+    const refreshFunction = getRefreshFunctionForLayer(layerConfig.count_key || layerId);
+    const isVisible = layersVisible[layerId as keyof typeof layersVisible];
+
+    return (
+      <label key={layerId} className="flex items-center">
+        <input
+          type="checkbox"
+          checked={isVisible}
+          onChange={(e) => setLayersVisible(prev => ({ ...prev, [layerId]: e.target.checked }))}
+          className="mr-2"
+          disabled={isLoading}
+        />
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1">
+              {layerConfig.icon && <span>{layerConfig.icon}</span>}
+              {layerConfig.translationKey 
+                ? t(layerConfig.translationKey, { count: Array.isArray(data) ? data.length : 0 })
+                : (layerConfig.count_key 
+                    ? `${t(layerConfig.label)} (${Array.isArray(data) ? data.length : 0})`
+                    : t(layerConfig.label)
+                  )
+              }
+            </span>
+            {layerConfig.count_key && (
+              <span className="text-sm text-gray-500">
+                {isLoading ? '...' : (Array.isArray(data) ? data.length : 0)}
+              </span>
+            )}
+          </div>
+          {error && layerConfig.offline_label && (
+            <div className="text-xs text-red-600 mt-1">
+              {t(layerConfig.offline_label)}
+            </div>
+          )}
+        </div>
+        {layerConfig.refreshable && refreshFunction && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              refreshFunction();
+            }}
+            disabled={isLoading}
+            className="ml-2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={`Refresh ${layerConfig.label.toLowerCase()}`}
+          >
+            <svg
+              className={`w-4 h-4 text-gray-600 dark:text-gray-400 ${isLoading ? 'animate-spin' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </button>
+        )}
+      </label>
+    );
+  };
+
   return (
     <div 
       className={`map-container ${isFullscreen ? 'fixed inset-0 z-[9999] bg-white' : ''}`}
@@ -411,24 +523,24 @@ export const MapView: React.FC<MapViewProps> = ({
       {(drawingMode || measurementMode) && (
         <div 
           className={`absolute z-[10] bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 ${
-            Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+            getControlPosition().includes('right') 
               ? 'right-4' 
-              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
+              : getControlPosition().includes('left') 
                 ? 'left-4' 
                 : 'left-1/2 transform -translate-x-1/2'
           }`}
           style={{
-            top: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('top') ? '1rem' : 'auto',
-            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') ? '1rem' : 'auto',
-            right: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+            top: getControlPosition().includes('top') ? '1rem' : 'auto',
+            bottom: getControlPosition().includes('bottom') ? '1rem' : 'auto',
+            right: getControlPosition().includes('right') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
               : 'auto',
-            left: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
+            left: getControlPosition().includes('left') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
-              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+              : getControlPosition().includes('right') 
                 ? 'auto' 
                 : '50%',
-            transform: !Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') && !Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+            transform: !getControlPosition().includes('left') && !getControlPosition().includes('right') 
               ? 'translateX(-50%)' 
               : 'none'
           }}
@@ -456,8 +568,8 @@ export const MapView: React.FC<MapViewProps> = ({
       )}
 
       <MapContainer
-        center={mapConfig.map_settings.center as [number, number]}
-        zoom={mapConfig.map_settings.zoom}
+        center={(mapSettings?.map_settings.center || mapConfig.map_settings.center) as [number, number]}
+        zoom={mapSettings?.map_settings.zoom || mapConfig.map_settings.zoom}
         className={`h-full w-full z-0 ${drawingMode ? 'drawing-mode' : ''} ${measurementMode ? 'measurement-mode' : ''} ${isSelectingPosition ? 'position-selecting' : ''}`}
         zoomControl={false}
         style={{ cursor: drawingMode || measurementMode || isSelectingPosition ? 'crosshair' : 'grab' }}
@@ -474,7 +586,7 @@ export const MapView: React.FC<MapViewProps> = ({
         {/* Drawing Controls */}
         <DrawingControls
           enabled={drawingMode}
-          position={Object.values(config.environment.MAP.map_controls)[0]?.position || "topright"}
+          position={getControlPosition()}
           onDrawCreated={handleDrawCreated}
           onDrawDeleted={handleDrawDeleted}
         />
@@ -589,9 +701,9 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Map Controls */}
       <MapControls
         ref={mapControlsRef}
-        controlsSettings={config.environment.MAP.controls_settings}
-        mapControls={config.environment.MAP.map_controls}
-        mapSettings={config.environment.MAP.map_settings}
+        controlsSettings={mapSettings?.controls_settings || {}}
+        mapControls={mapSettings?.map_controls || {}}
+        mapSettings={mapSettings?.map_settings || mapConfig.map_settings}
         onControlClick={handleControlClick}
         activeControls={new Set([
           ...(drawingMode ? ['draw'] : []),
@@ -608,15 +720,15 @@ export const MapView: React.FC<MapViewProps> = ({
           className={`absolute z-[10] bg-blue-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
           style={{
             top: 'auto',
-            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
+            bottom: getControlPosition().includes('bottom') 
               ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
               : 'auto',
-            right: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+            right: getControlPosition().includes('right') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
               : 'auto',
-            left: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
+            left: getControlPosition().includes('left') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
-              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+              : getControlPosition().includes('right') 
                 ? 'auto' 
                 : '1rem',
           }}
@@ -637,17 +749,17 @@ export const MapView: React.FC<MapViewProps> = ({
           className={`absolute z-[10] bg-green-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs`}
           style={{
             top: '4rem',
-            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
+            bottom: getControlPosition().includes('bottom') 
               ? drawingMode 
                 ? 'calc(var(--controls-height, 5rem) + 6rem)' // Stack above drawing indicator
                 : 'calc(var(--controls-height, 5rem) + 0.5rem)'
               : 'auto',
-            right: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+            right: getControlPosition().includes('right') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
               : 'auto',
-            left: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('left') 
+            left: getControlPosition().includes('left') 
               ? 'calc(var(--controls-width, 5rem) + 1rem)' 
-              : Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') 
+              : getControlPosition().includes('right') 
                 ? 'auto' 
                 : '1rem',
           }}
@@ -672,98 +784,28 @@ export const MapView: React.FC<MapViewProps> = ({
       {showLayerPanel && (
         <div 
           className={`absolute z-[10] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-xs ${
-            Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('right') ? 'right-4' : 'left-4'
+            getControlPosition().includes('right') ? 'right-4' : 'left-4'
           }`}
           style={{
-            top: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('top') 
+            top: getControlPosition().includes('top') 
               ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
               : 'auto'
           }}
         >
           <h3 className="font-semibold mb-2">{t('DASHBOARD_MAP_LAYERS_PANEL_TITLE')}</h3>
           <div className="space-y-3">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={layersVisible.sensors}
-                onChange={(e) => setLayersVisible(prev => ({ ...prev, sensors: e.target.checked }))}
-                className="mr-2"
-              />
-              {t('DASHBOARD_MAP_LAYERS_PANEL_SENSORS_COUNT', { count: sensors.length })}
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={layersVisible.greenZones}
-                onChange={(e) => setLayersVisible(prev => ({ ...prev, greenZones: e.target.checked }))}
-                className="mr-2"
-              />
-              {t('DASHBOARD_MAP_LAYERS_PANEL_GREEN_ZONES_COUNT', { count: greenZones.length })}
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={layersVisible.heatmap}
-                onChange={(e) => setLayersVisible(prev => ({ ...prev, heatmap: e.target.checked }))}
-                className="mr-2"
-              />
-              {t('DASHBOARD_MAP_LAYERS_PANEL_TEMPERATURE_HEATMAP')}
-            </label>
+            {/* Dynamic layers from configuration */}
+            {getLayerToggleItems()?.map((layerId: string) => {
+              const dataLayers = getDataLayers();
+              const layerConfig = dataLayers?.[layerId];
+              if (!layerConfig || !layerConfig.enabled) return null;
+              return renderLayerToggle(layerId, layerConfig);
+            })}
             
-            {/* Air Quality Layer */}
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={layersVisible.airQuality}
-                onChange={(e) => setLayersVisible(prev => ({ ...prev, airQuality: e.target.checked }))}
-                className="mr-2"
-                disabled={airQualityLoading}
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span>Air Quality Stations</span>
-                  <span className="text-sm text-gray-500">
-                    {airQualityLoading ? '...' : airQualityStations.length}
-                  </span>
-                </div>
-                {airQualityError && (
-                  <div className="text-xs text-red-600 mt-1">
-                    Using offline data
-                  </div>
-                )}
-                {!airQualityLoading && airQualityLastUpdated && (
-                  <div className="text-xs text-gray-500 mt-1">
-                    Updated {formatLastUpdated(airQualityLastUpdated)}
-                  </div>
-                )}
-              </div>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  refreshAirQuality();
-                }}
-                disabled={airQualityLoading}
-                className="ml-2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Refresh air quality data"
-              >
-                <svg
-                  className={`w-4 h-4 text-gray-600 dark:text-gray-400 ${airQualityLoading ? 'animate-spin' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-              </button>
-            </label>
-            
-            {/* Air Quality Legend - only show when layer is visible */}
-            {layersVisible.airQuality && airQualityStations.length > 0 && (
+            {/* Air Quality Legend - only show when air quality layer is visible and has legend enabled */}
+            {getDataLayers()?.airQuality?.showLegend && 
+             layersVisible.airQuality && 
+             airQualityStations.length > 0 && (
               <div className="ml-6 mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs">
                 <div className="font-medium mb-1">Air Quality Index</div>
                 <div className="space-y-1">

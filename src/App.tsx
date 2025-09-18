@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Dashboard } from './modules/dashboard';
-import { ThemeProvider, AppProvider } from './contexts';
+import { AppProviders } from './contexts';
 import WiFiCoveragePage from './pages/WiFiPage';
 import CockpitPage from './pages/CockpitPage';
 import { detectRuntimeEnvironment, getEnvironmentConfig } from './utils/environmentDetector';
@@ -22,9 +22,8 @@ function App() {
   console.log('� Current pathname:', window.location.pathname);
   
   return (
-    <AppProvider>
-      <ThemeProvider>
-        <Router basename={basename}>
+    <AppProviders>
+      <Router basename={basename}>
         <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
           {/* Skip to main content link for keyboard users */}
           <a 
@@ -72,9 +71,8 @@ function App() {
             } />
           </Routes>
         </div>
-        </Router>
-      </ThemeProvider>
-    </AppProvider>
+      </Router>
+    </AppProviders>
   );
 }
 

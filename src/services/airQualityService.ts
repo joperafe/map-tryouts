@@ -172,7 +172,7 @@ export class AirQualityService {
     console.log('🔧🔧🔧 [FORCED DEBUG] Using mock data instead of API - CHECK IF MARKERS APPEAR! 🔧🔧🔧');
     console.log('📍 Mock data stations count:', MOCK_AIR_QUALITY_DATA.length);
     return MOCK_AIR_QUALITY_DATA;
-    const endpoint = isDevelopment ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD;
+    const endpoint = import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD;
 
     try {
       console.log(`Attempting to fetch air quality data from: ${endpoint}`);

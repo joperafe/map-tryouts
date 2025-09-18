@@ -4,23 +4,30 @@ import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
 import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
 import { DebugToggle } from '../../../components/DebugToggle';
-import { useSensors, useGreenZones } from '../hooks';
-import { getConfig } from '../../../config';
+import { useMapData } from '../../../contexts';
+import { useSettings } from '../../../hooks';
 import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 
 export const Dashboard: React.FC = () => {
-  const config = getConfig();
+  const settings = useSettings();
   const { environment, config: runtimeConfig } = useRuntimeEnvironment();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { sensors, loading: sensorsLoading, error: sensorsError, refetch: refetchSensors } = useSensors();
-  const { greenZones, loading: greenZonesLoading, error: greenZonesError, refetch: refetchGreenZones } = useGreenZones();
+  
+  // Use global data instead of local hooks
+  const { 
+    sensors, 
+    greenZones, 
+    loading,
+    errors,
+    refreshAllLayers 
+  } = useMapData();
 
   // Only log once when environment changes
   useEffect(() => {
     console.log('🎯 Dashboard - Environment:', environment, 'Config:', runtimeConfig);
   }, [environment, runtimeConfig]);
 
-  if (sensorsLoading || greenZonesLoading) {
+  if (loading.sensors || loading.greenZones) {
     return (
       <div className="h-full flex items-center justify-center">
         <section className="text-center" role="status" aria-live="polite">
@@ -31,7 +38,7 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  if (sensorsError || greenZonesError) {
+  if (errors.sensors || errors.greenZones) {
     return (
       <div className="h-full flex items-center justify-center">
         <section className="text-center max-w-md" role="alert" aria-live="assertive">
@@ -40,13 +47,12 @@ export const Dashboard: React.FC = () => {
             Error Loading Data
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {sensorsError || greenZonesError}
+            {errors.sensors || errors.greenZones}
           </p>
           <div className="space-x-2">
             <button
               onClick={() => {
-                refetchSensors();
-                refetchGreenZones();
+                refreshAllLayers();
               }}
               className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               aria-label="Retry loading environmental data"
@@ -166,7 +172,7 @@ export const Dashboard: React.FC = () => {
                   </section>
 
                   {/* Green Zones Summary */}
-                  {config.environment.FEATURES.enableGreenZones && (
+                  {settings?.FEATURES.enableGreenZones && (
                     <section>
                       <h3 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-3">
                         Green Zones ({greenZones.length})
@@ -219,13 +225,13 @@ export const Dashboard: React.FC = () => {
 
         {/* Mobile Map */}
         <main className="h-[calc(100vh-theme(spacing.16))]" role="main" aria-label="Interactive map">
-          <MapView
-            sensors={sensors}
-            greenZones={greenZones}
-            mapConfig={config.environment.MAP}
-            showSensors={true}
-            showGreenZones={runtimeConfig.enableGreenZones}
-          />
+          {settings?.MAP && (
+            <MapView
+              mapConfig={settings.MAP}
+              showSensors={true}
+              showGreenZones={runtimeConfig.enableGreenZones}
+            />
+          )}
         </main>
       </div>
 
@@ -285,7 +291,7 @@ export const Dashboard: React.FC = () => {
             </section>
 
             {/* Green Zones Summary */}
-            {config.environment.FEATURES.enableGreenZones && (
+            {settings?.FEATURES.enableGreenZones && (
               <section className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   Green Zones ({greenZones.length})
@@ -340,13 +346,13 @@ export const Dashboard: React.FC = () => {
 
         {/* Desktop Main Content - Map */}
         <main className="flex-1 relative" role="main" aria-label="Interactive map">
-          <MapView
-            sensors={sensors}
-            greenZones={greenZones}
-            mapConfig={config.environment.MAP}
-            showSensors={true}
-            showGreenZones={runtimeConfig.enableGreenZones}
-          />
+          {settings?.MAP && (
+            <MapView
+              mapConfig={settings.MAP}
+              showSensors={true}
+              showGreenZones={runtimeConfig.enableGreenZones}
+            />
+          )}
         </main>
       </div>
     </div>
