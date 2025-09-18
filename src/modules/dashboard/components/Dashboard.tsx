@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
+import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
 import { useSensors, useGreenZones } from '../hooks';
 import { getConfig } from '../../../config';
+import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 
 export const Dashboard: React.FC = () => {
   const config = getConfig();
+  const { environment, config: runtimeConfig } = useRuntimeEnvironment();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { sensors, loading: sensorsLoading, error: sensorsError, refetch: refetchSensors } = useSensors();
   const { greenZones, loading: greenZonesLoading, error: greenZonesError, refetch: refetchGreenZones } = useGreenZones();
+
+  console.log('🎯 Dashboard - Current environment:', environment);
+  console.log('⚙️ Dashboard - Runtime config:', runtimeConfig);
 
   if (sensorsLoading || greenZonesLoading) {
     return (
@@ -53,6 +59,9 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navigation />
+      
+      {/* Environment Indicator */}
+      <EnvironmentIndicator />
       
       {/* Mobile layout */}
       <div className="md:hidden">
@@ -209,7 +218,7 @@ export const Dashboard: React.FC = () => {
             greenZones={greenZones}
             mapConfig={config.environment.MAP}
             showSensors={true}
-            showGreenZones={config.environment.FEATURES.enableGreenZones}
+            showGreenZones={runtimeConfig.enableGreenZones}
           />
         </main>
       </div>
@@ -330,7 +339,7 @@ export const Dashboard: React.FC = () => {
             greenZones={greenZones}
             mapConfig={config.environment.MAP}
             showSensors={true}
-            showGreenZones={config.environment.FEATURES.enableGreenZones}
+            showGreenZones={runtimeConfig.enableGreenZones}
           />
         </main>
       </div>

@@ -1,32 +1,24 @@
-name: Deploy to Multiple Environments
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, release]
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - production
 
 jobs:
-  deploy-production:
-    if: github.ref == 'refs/heads/main'
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
-      name: production
-      url: https://joperafe.github.io/map-tryouts/
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,9 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run tests
-        run: npm run test --if-present
 
       - name: Run linting
         run: npm run lint
@@ -50,53 +39,15 @@ jobs:
         env:
           NODE_ENV: production
           VITE_ENVIRONMENT: PROD
-          VITE_BASE_URL: /map-tryouts/
 
-      - name: Deploy to GitHub Pages (Production)
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          cname: false
+          path: ./dist
 
-  deploy-staging:
-    if: github.ref == 'refs/heads/release'
-    runs-on: ubuntu-latest
-    environment:
-      name: staging
-      url: https://joperafe.github.io/map-tryouts/staging/
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm run test --if-present
-
-      - name: Build for staging
-        run: |
-          npm run config:dev
-          npm run build
-        env:
-          NODE_ENV: development
-          VITE_ENVIRONMENT: DEV
-          VITE_BASE_URL: /map-tryouts/staging/
-
-      - name: Deploy to GitHub Pages (Staging)
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          destination_dir: staging
-          cname: false
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

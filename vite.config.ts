@@ -5,23 +5,8 @@ import { buildMetadata } from './src/plugins/build-metadata'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const environment = process.env.VITE_ENVIRONMENT;
-  
-  // Determine base path based on environment
-  let basePath = '/';
-  
-  if (process.env.NODE_ENV === 'production') {
-    if (environment === 'DEV') {
-      // release branch → staging environment
-      basePath = '/map-tryouts/staging/';
-    } else if (environment === 'PROD') {
-      // main branch → production environment  
-      basePath = '/map-tryouts/';
-    } else {
-      // fallback for production builds
-      basePath = '/map-tryouts/';
-    }
-  }
+  // Simple base path for production deployment
+  const basePath = process.env.NODE_ENV === 'production' ? '/map-tryouts/' : '/';
 
   return {
     base: basePath,
@@ -60,7 +45,7 @@ export default defineConfig(({ mode }) => {
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.VITE_BASE_PATH': JSON.stringify(basePath),
-      'process.env.VITE_ENVIRONMENT': JSON.stringify(environment),
+      'process.env.VITE_ENVIRONMENT': JSON.stringify(process.env.VITE_ENVIRONMENT || 'PROD'),
     },
   };
 })
