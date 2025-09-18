@@ -14,22 +14,37 @@ L.Icon.Default.mergeOptions({
 });
 
 export const InteractiveMap: React.FC<InteractiveMapProps> = ({
-  config,
+  mapConfig,
   layers = [],
   className = '',
   style,
 }) => {
-  // Use layers from props or config, props take priority
-  const mapLayers = layers.length > 0 ? layers : (config.layers || []);
+  // Use layers from props or mapConfig data layers
+  const mapLayers = layers.length > 0 ? layers : [];
 
-  // Map configuration with defaults
-  const mapConfig = {
-    center: config.initialCenter,
-    zoom: config.initialZoom,
-    minZoom: config.minZoom || 1,
-    maxZoom: config.maxZoom || 18,
-    tileLayerUrl: config.tileLayerUrl || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    tileLayerAttribution: config.tileLayerAttribution || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  // Extract map settings from the MAP.map_settings structure
+  const { map_settings } = mapConfig;
+  
+  // Get tile layer configuration
+  const defaultTileLayer = mapConfig.default_tile_layer || 'openstreetmap';
+  const tileLayerConfig = mapConfig.tile_layers?.[defaultTileLayer];
+  
+  // Map configuration using MAP.map_settings
+  const leafletMapConfig = {
+    center: [map_settings.center[0], map_settings.center[1]] as [number, number],
+    zoom: map_settings.zoom,
+    minZoom: map_settings.minZoom,
+    maxZoom: map_settings.maxZoom,
+    scrollWheelZoom: map_settings.scrollWheelZoom ?? true,
+    doubleClickZoom: map_settings.doubleClickZoom ?? true,
+    boxZoom: map_settings.boxZoom ?? true,
+    keyboard: map_settings.keyboard ?? true,
+  };
+
+  // Tile layer configuration
+  const tileConfig = {
+    url: tileLayerConfig?.url || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: tileLayerConfig?.attribution || mapConfig.default_attribution || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   };
 
   const containerStyle: React.CSSProperties = {
@@ -104,16 +119,20 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       style={containerStyle}
     >
       <MapContainer
-        center={mapConfig.center}
-        zoom={mapConfig.zoom}
-        minZoom={mapConfig.minZoom}
-        maxZoom={mapConfig.maxZoom}
+        center={leafletMapConfig.center}
+        zoom={leafletMapConfig.zoom}
+        minZoom={leafletMapConfig.minZoom}
+        maxZoom={leafletMapConfig.maxZoom}
+        scrollWheelZoom={leafletMapConfig.scrollWheelZoom}
+        doubleClickZoom={leafletMapConfig.doubleClickZoom}
+        boxZoom={leafletMapConfig.boxZoom}
+        keyboard={leafletMapConfig.keyboard}
         className="h-full w-full"
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          attribution={mapConfig.tileLayerAttribution}
-          url={mapConfig.tileLayerUrl}
+          attribution={tileConfig.attribution}
+          url={tileConfig.url}
         />
 
         {/* Render all layers */}

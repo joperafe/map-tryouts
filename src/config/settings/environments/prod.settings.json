@@ -13,14 +13,13 @@
   },
   "MAP": {
     "controls_settings": {
-      "draw": { 
-        "enabled": false
-      },
-      "measurement": { 
-        "enabled": false
-      },
-      "export": {
-        "enabled": false
+      "layer_toggle": { 
+        "enabled": true, 
+        "label": "DASHBOARD_MAP_CONTROLS_LAYERS", 
+        "icon": "🗂️",
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_LAYERS",
+        "shortcut": "L",
+        "items": ["airQuality"]
       }
     },
     "map_controls": {
