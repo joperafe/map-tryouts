@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Dashboard } from './modules/dashboard';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider, AppProvider } from './contexts';
 import WiFiCoveragePage from './pages/WiFiPage';
 import CockpitPage from './pages/CockpitPage';
 import { detectRuntimeEnvironment, getEnvironmentConfig } from './utils/environmentDetector';
 import './utils/debugEnvironment'; // Auto-run debug in development
+import './utils/testEnvironmentDetection'; // Test environment detection
 import './i18n';
 
 function App() {
@@ -21,8 +22,9 @@ function App() {
   console.log('� Current pathname:', window.location.pathname);
   
   return (
-    <ThemeProvider>
-      <Router basename={basename}>
+    <AppProvider>
+      <ThemeProvider>
+        <Router basename={basename}>
         <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
           {/* Skip to main content link for keyboard users */}
           <a 
@@ -70,8 +72,9 @@ function App() {
             } />
           </Routes>
         </div>
-      </Router>
-    </ThemeProvider>
+        </Router>
+      </ThemeProvider>
+    </AppProvider>
   );
 }
 

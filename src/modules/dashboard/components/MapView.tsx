@@ -9,6 +9,9 @@ import { MeasurementControls } from './MeasurementControls';
 import { AddSensorPanel, type NewSensorData } from './AddSensorPanel';
 import { TempSensorMarker } from './TempSensorMarker';
 import { MapEvents } from './MapEvents';
+import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
+import { useAirQuality } from '../../../hooks/useAirQuality';
+import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
 import type { Sensor, GreenZone, AppConfig } from '../../../types';
 import { getConfig } from '../../../config';
 import { getAirQualityColor } from '../../../utils';
@@ -43,11 +46,22 @@ export const MapView: React.FC<MapViewProps> = ({
     sensors: showSensors,
     greenZones: showGreenZones,
     heatmap: false,
+    airQuality: true, // Enable by default to show air quality data
   });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [drawingMode, setDrawingMode] = useState(false);
   const [measurementMode, setMeasurementMode] = useState(false);
   const [showLayerPanel, setShowLayerPanel] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // Air Quality data - load immediately and auto-refresh
+  const {
+    stations: airQualityStations,
+    loading: airQualityLoading,
+    error: airQualityError,
+    lastUpdated: airQualityLastUpdated,
+    refreshData: refreshAirQuality,
+  } = useAirQuality(true, 300000); // Auto-refresh every 5 minutes
   const [drawnItems, setDrawnItems] = useState<L.Layer[]>([]);
   const [measurementResult, setMeasurementResult] = useState<{
     distance?: number;
@@ -269,6 +283,45 @@ export const MapView: React.FC<MapViewProps> = ({
     }
   };
 
+  const handleRefreshAllLayers = async () => {
+    console.log('Refreshing all active layers...');
+    setIsRefreshing(true);
+    
+    // Create a registry of available refresh functions for each layer type
+    const layerRefreshFunctions: Record<string, () => Promise<void>> = {
+      airQuality: refreshAirQuality,
+      // Add more layer refresh functions here as they become available:
+      // sensors: refreshSensorData,
+      // greenZones: refreshGreenZoneData,
+      // heatmap: refreshHeatmapData,
+    };
+    
+    // Collect refresh promises for all visible layers that have refresh functions
+    const refreshPromises = Object.entries(layersVisible)
+      .filter(([layerType, isVisible]) => {
+        const hasRefreshFunction = layerType in layerRefreshFunctions;
+        if (isVisible && hasRefreshFunction) {
+          console.log(`Refreshing ${layerType} layer...`);
+          return true;
+        }
+        return false;
+      })
+      .map(([layerType]) => layerRefreshFunctions[layerType]());
+    
+    try {
+      if (refreshPromises.length === 0) {
+        console.log('No active layers with refresh functionality found');
+      } else {
+        await Promise.all(refreshPromises);
+        console.log(`Successfully refreshed ${refreshPromises.length} active layer(s)`);
+      }
+    } catch (error) {
+      console.error('Error refreshing layers:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const handleControlClick = (controlType: string) => {
     switch (controlType) {
       case 'layer_toggle':
@@ -285,6 +338,9 @@ export const MapView: React.FC<MapViewProps> = ({
         break;
       case 'add_sensor':
         setShowAddSensorPanel(true);
+        break;
+      case 'refresh':
+        handleRefreshAllLayers();
         break;
       default:
         console.warn(`Unknown control type: ${controlType}`);
@@ -317,6 +373,33 @@ export const MapView: React.FC<MapViewProps> = ({
       default:
         return '#10b981';
     }
+  };
+
+  const formatLastUpdated = (date: Date) => {
+    const now = new Date();
+    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffMinutes < 1) return 'just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
+  const getAirQualityLegend = () => {
+    const stationCounts = airQualityStations.reduce((acc, station) => {
+      acc[station.qualityLevel] = (acc[station.qualityLevel] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return Object.entries(AIR_QUALITY_COLORS).map(([level, color]) => ({
+      level,
+      color,
+      count: stationCounts[level] || 0,
+    }));
   };
 
   return (
@@ -486,6 +569,21 @@ export const MapView: React.FC<MapViewProps> = ({
             </Popup>
           </Polygon>
         ))}
+
+        {/* Air Quality Stations */}
+        <AirQualityLayer
+          stations={airQualityStations}
+          visible={layersVisible.airQuality}
+          onStationClick={(station) => {
+            console.log('Air quality station clicked:', station.id);
+          }}
+        />
+        {/* Debug info for air quality */}
+        {layersVisible.airQuality && (
+          <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'red', color: 'white', padding: '10px', zIndex: 1000 }}>
+            🔍 DEBUG: {airQualityStations.length} stations, visible: {layersVisible.airQuality.toString()}
+          </div>
+        )}
       </MapContainer>
 
       {/* Map Controls */}
@@ -500,6 +598,7 @@ export const MapView: React.FC<MapViewProps> = ({
           ...(measurementMode ? ['measurement'] : []),
           ...(isFullscreen ? ['fullscreen'] : []),
           ...(showLayerPanel ? ['layer_toggle'] : []),
+          ...(isRefreshing ? ['refresh'] : []),
         ])}
       />
 
@@ -578,14 +677,11 @@ export const MapView: React.FC<MapViewProps> = ({
           style={{
             top: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('top') 
               ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
-              : 'auto',
-            bottom: Object.values(config.environment.MAP.map_controls)[0]?.position || "topright".includes('bottom') 
-              ? 'calc(var(--controls-height, 5rem) + 0.5rem)' 
-              : 'auto',
+              : 'auto'
           }}
         >
           <h3 className="font-semibold mb-2">{t('DASHBOARD_MAP_LAYERS_PANEL_TITLE')}</h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="flex items-center">
               <input
                 type="checkbox"
@@ -613,6 +709,79 @@ export const MapView: React.FC<MapViewProps> = ({
               />
               {t('DASHBOARD_MAP_LAYERS_PANEL_TEMPERATURE_HEATMAP')}
             </label>
+            
+            {/* Air Quality Layer */}
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={layersVisible.airQuality}
+                onChange={(e) => setLayersVisible(prev => ({ ...prev, airQuality: e.target.checked }))}
+                className="mr-2"
+                disabled={airQualityLoading}
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span>Air Quality Stations</span>
+                  <span className="text-sm text-gray-500">
+                    {airQualityLoading ? '...' : airQualityStations.length}
+                  </span>
+                </div>
+                {airQualityError && (
+                  <div className="text-xs text-red-600 mt-1">
+                    Using offline data
+                  </div>
+                )}
+                {!airQualityLoading && airQualityLastUpdated && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    Updated {formatLastUpdated(airQualityLastUpdated)}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  refreshAirQuality();
+                }}
+                disabled={airQualityLoading}
+                className="ml-2 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Refresh air quality data"
+              >
+                <svg
+                  className={`w-4 h-4 text-gray-600 dark:text-gray-400 ${airQualityLoading ? 'animate-spin' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
+            </label>
+            
+            {/* Air Quality Legend - only show when layer is visible */}
+            {layersVisible.airQuality && airQualityStations.length > 0 && (
+              <div className="ml-6 mt-2 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs">
+                <div className="font-medium mb-1">Air Quality Index</div>
+                <div className="space-y-1">
+                  {getAirQualityLegend().map(({ level, color, count }) => (
+                    <div key={level} className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <div
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span>{level}</span>
+                      </div>
+                      <span className="text-gray-500">{count || '—'}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

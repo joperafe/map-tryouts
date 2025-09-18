@@ -3,6 +3,7 @@ import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
 import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
+import { DebugToggle } from '../../../components/DebugToggle';
 import { useSensors, useGreenZones } from '../hooks';
 import { getConfig } from '../../../config';
 import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
@@ -64,6 +65,9 @@ export const Dashboard: React.FC = () => {
       
       {/* Environment Indicator */}
       <EnvironmentIndicator />
+      
+      {/* Debug Toggle */}
+      <DebugToggle />
       
       {/* Mobile layout */}
       <div className="md:hidden">

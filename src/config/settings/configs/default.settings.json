@@ -107,6 +107,13 @@
         "icon": "📤",
         "tooltip": "DASHBOARD_MAP_TOOLTIPS_EXPORT",
         "shortcut": "E"
+      },
+      "refresh": {
+        "enabled": true,
+        "label": "DASHBOARD_MAP_CONTROLS_REFRESH",
+        "icon": "🔄",
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_REFRESH",
+        "shortcut": "R"
       }
     },
     "map_controls": {
@@ -123,7 +130,7 @@
           },
           {
             "type": "toggle",
-            "items": ["fullscreen", "export"]
+            "items": ["fullscreen", "export", "refresh"]
           }
         ]
       }

@@ -1,12 +1,14 @@
 import React from 'react';
 import { getEnvironmentConfig, getEnvironmentUrls } from '../utils/environmentDetector';
+import { useApp } from '../contexts';
 
 export const EnvironmentIndicator: React.FC = () => {
   const config = getEnvironmentConfig();
   const urls = getEnvironmentUrls();
+  const { debug } = useApp();
   
-  // Don't show indicator in production unless debug mode is enabled
-  if (config.environment === 'PROD' && !config.enableDebugMode) {
+  // Only show indicator if debug flag is enabled
+  if (!debug) {
     return null;
   }
 

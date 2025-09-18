@@ -41,6 +41,25 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5000,
       open: true,
+      proxy: {
+        '/api/fiware': {
+          target: 'https://broker.fiware.urbanplatform.portodigital.pt',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/fiware/, ''),
+          secure: false, // Disable SSL verification for development
+          configure: (proxy) => {
+            proxy.on('error', (err) => {
+              console.log('proxy error', err);
+            });
+            proxy.on('proxyReq', (_proxyReq, req) => {
+              console.log('Sending Request to the Target:', req.method, req.url);
+            });
+            proxy.on('proxyRes', (proxyRes, req) => {
+              console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+            });
+          },
+        },
+      },
     },
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
