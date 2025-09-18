@@ -71,7 +71,8 @@
         "label": "DASHBOARD_MAP_CONTROLS_LAYERS", 
         "icon": "🗂️",
         "tooltip": "DASHBOARD_MAP_TOOLTIPS_LAYERS",
-        "shortcut": "L"
+        "shortcut": "L",
+        "items": ["sensors", "airQuality", "greenZones"]
       },
       "add_sensor": { 
         "enabled": true, 
@@ -107,6 +108,13 @@
         "icon": "📤",
         "tooltip": "DASHBOARD_MAP_TOOLTIPS_EXPORT",
         "shortcut": "E"
+      },
+      "refresh": {
+        "enabled": true,
+        "label": "DASHBOARD_MAP_CONTROLS_REFRESH",
+        "icon": "🔄",
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_REFRESH",
+        "shortcut": "R"
       }
     },
     "map_controls": {
@@ -123,7 +131,7 @@
           },
           {
             "type": "toggle",
-            "items": ["fullscreen", "export"]
+            "items": ["fullscreen", "export", "refresh"]
           }
         ]
       }
@@ -138,6 +146,46 @@
       "boxZoom": true,
       "keyboard": true,
       "displayControlLabel": false
+    },
+    "data_layers": {
+      "sensors": {
+        "enabled": true,
+        "visible": true,
+        "label": "DASHBOARD_MAP_LAYERS_PANEL_SENSORS",
+        "icon": "🌡️",
+        "refreshable": true,
+        "count_key": "sensors",
+        "translationKey": "DASHBOARD_MAP_LAYERS_PANEL_SENSORS_COUNT"
+      },
+      "greenZones": {
+        "enabled": true,
+        "visible": true,
+        "label": "DASHBOARD_MAP_LAYERS_PANEL_GREEN_ZONES",
+        "icon": "🌿",
+        "refreshable": true,
+        "count_key": "greenZones",
+        "translationKey": "DASHBOARD_MAP_LAYERS_PANEL_GREEN_ZONES_COUNT"
+      },
+      "airQuality": {
+        "enabled": true,
+        "visible": true,
+        "label": "DASHBOARD_MAP_LAYERS_PANEL_AIR_QUALITY",
+        "icon": "🌬️",
+        "refreshable": true,
+        "count_key": "airQualityStations",
+        "translationKey": "DASHBOARD_MAP_LAYERS_PANEL_AIR_QUALITY_COUNT",
+        "showLegend": true,
+        "offline_label": "DASHBOARD_MAP_LAYERS_PANEL_OFFLINE_DATA",
+        "api_url": "https://broker.fiware.urbanplatform.portodigital.pt/v2/entities?type=AirQualityObserved"
+      },
+      "heatmap": {
+        "enabled": true,
+        "visible": false,
+        "label": "DASHBOARD_MAP_LAYERS_PANEL_TEMPERATURE_HEATMAP",
+        "icon": "🔥",
+        "refreshable": false,
+        "translationKey": "DASHBOARD_MAP_LAYERS_PANEL_TEMPERATURE_HEATMAP"
+      }
     },
     "default_tile_layer": "openstreetmap",
     "default_attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",

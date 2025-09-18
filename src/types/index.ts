@@ -55,6 +55,7 @@ export interface AppConfig {
       keyboard?: boolean;
       displayControlLabel?: boolean;
     };
+    data_layers?: Record<string, MapDataLayer>;
     default_tile_layer?: string;
     default_attribution?: string;
     tile_layers?: Record<string, {
@@ -70,6 +71,21 @@ export interface MapControlSetting {
   label: string;
   icon?: string;
   tooltip?: string;
+  shortcut?: string;
+  items?: string[]; // Array of layer IDs for layer_toggle control
+}
+
+export interface MapDataLayer {
+  enabled: boolean;
+  visible: boolean;
+  label: string;
+  icon?: string;
+  refreshable: boolean;
+  count_key?: string;
+  translationKey?: string;
+  showLegend?: boolean;
+  offline_label?: string;
+  api_url?: string;
 }
 
 export interface MapControlLayout {

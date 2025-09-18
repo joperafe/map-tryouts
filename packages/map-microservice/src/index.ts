@@ -1,45 +1,40 @@
-// Main exports
+// Main Components
 export { InteractiveMap } from './InteractiveMap';
 
-// Type exports
+// Types
 export type {
-  InteractiveMapProps,
   MapConfig,
+  MapSettings,
+  TileLayerConfig,
+  DataLayer,
+  ControlSetting,
+  ControlLayout,
+  ControlElement,
+  InteractiveMapProps,
   Layer,
   MarkerLayer,
   PolygonLayer,
   HeatmapLayer,
+  BaseLayer,
   MarkerData,
   PolygonData,
   HeatmapPoint,
+  MarkerIconConfig,
+  PolygonStyleConfig,
+  HeatmapConfig,
+  PopupContent,
   MapControl,
   ControlsConfig,
   FeaturesConfig,
   MapEvents,
   MeasurementResult,
-  PopupContent,
-  MarkerIconConfig,
-  PolygonStyleConfig,
-  HeatmapConfig,
+  DrawnShape,
   ThemeConfig,
   MapPlugin,
   PluginConfig,
-  DrawnShape,
   LayerMetadata,
 } from './types';
 
-// Utility exports
-export { defaultTheme, getThemeColors } from './utils/theme';
-
-// Configuration presets
-export { 
-  createMapConfig, 
-  createMarkerLayer, 
-  createPolygonLayer, 
-  createHeatmapLayer,
-  mapPresets 
-} from './utils/config';
-
-// Component exports for advanced usage
-export { LayerRenderer } from './components/LayerRenderer';
-export { MapControls } from './components/MapControls';
+// Utilities
+export { adaptMapConfig } from './utils/configAdapter';
+export type { MainAppMapConfig } from './utils/configAdapter';

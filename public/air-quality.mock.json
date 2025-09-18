@@ -1,0 +1,148 @@
+[
+  {
+    "id": "urn:ngsi-ld:AirQualityObserved:Porto:Station:001",
+    "type": "AirQualityObserved",
+    "location": {
+      "type": "geo:json",
+      "value": {
+        "type": "Point",
+        "coordinates": [-8.6291, 41.1579]
+      },
+      "metadata": {}
+    },
+    "dateObserved": {
+      "type": "DateTime",
+      "value": "2025-09-18T12:00:00.000Z",
+      "metadata": {}
+    },
+    "pm25": {
+      "type": "Number",
+      "value": 15.2,
+      "metadata": {}
+    },
+    "pm10": {
+      "type": "Number",
+      "value": 22.8,
+      "metadata": {}
+    },
+    "no2": {
+      "type": "Number",
+      "value": 38.5,
+      "metadata": {}
+    },
+    "o3": {
+      "type": "Number",
+      "value": 65.1,
+      "metadata": {}
+    },
+    "co": {
+      "type": "Number",
+      "value": 2.1,
+      "metadata": {}
+    },
+    "temperature": {
+      "type": "Number",
+      "value": 18.5,
+      "metadata": {}
+    },
+    "humidity": {
+      "type": "Number",
+      "value": 72.3,
+      "metadata": {}
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:AirQualityObserved:Porto:Station:002",
+    "type": "AirQualityObserved",
+    "location": {
+      "type": "geo:json",
+      "value": {
+        "type": "Point",
+        "coordinates": [-8.6100, 41.1400]
+      },
+      "metadata": {}
+    },
+    "dateObserved": {
+      "type": "DateTime",
+      "value": "2025-09-18T11:30:00.000Z",
+      "metadata": {}
+    },
+    "pm25": {
+      "type": "Number",
+      "value": 25.7,
+      "metadata": {}
+    },
+    "pm10": {
+      "type": "Number",
+      "value": 42.3,
+      "metadata": {}
+    },
+    "no2": {
+      "type": "Number",
+      "value": 55.2,
+      "metadata": {}
+    },
+    "o3": {
+      "type": "Number",
+      "value": 48.9,
+      "metadata": {}
+    },
+    "co": {
+      "type": "Number",
+      "value": 3.4,
+      "metadata": {}
+    }
+  },
+  {
+    "id": "urn:ngsi-ld:AirQualityObserved:Porto:Station:003",
+    "type": "AirQualityObserved",
+    "location": {
+      "type": "geo:json",
+      "value": {
+        "type": "Point",
+        "coordinates": [-8.6500, 41.1700]
+      },
+      "metadata": {}
+    },
+    "dateObserved": {
+      "type": "DateTime",
+      "value": "2025-09-18T10:00:00.000Z",
+      "metadata": {}
+    },
+    "pm25": {
+      "type": "Number",
+      "value": 8.1,
+      "metadata": {}
+    },
+    "pm10": {
+      "type": "Number",
+      "value": 18.5,
+      "metadata": {}
+    },
+    "no2": {
+      "type": "Number",
+      "value": 28.7,
+      "metadata": {}
+    },
+    "o3": {
+      "type": "Number",
+      "value": 78.2,
+      "metadata": {}
+    },
+    "co": {
+      "type": "Number",
+      "value": 1.2,
+      "metadata": {}
+    },
+    "temperature": {
+      "type": "Number",
+      "value": 19.8,
+      "metadata": {}
+    },
+    "humidity": {
+      "type": "Number",
+      "value": 68.1,
+      "metadata": {}
+    }
+  }
+]

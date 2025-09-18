@@ -1,20 +1,70 @@
 import type { LatLngExpression, Map as LeafletMap } from 'leaflet';
 import React from 'react';
 
-// Core Map Types
+// Core Map Settings (aligned with main app MAP.map_settings)
+export interface MapSettings {
+  center: number[]; // [lat, lng] - exactly 2 numbers
+  zoom: number;
+  maxZoom: number;
+  minZoom: number;
+  scrollWheelZoom?: boolean;
+  doubleClickZoom?: boolean;
+  boxZoom?: boolean;
+  keyboard?: boolean;
+  displayControlLabel?: boolean;
+}
+
+// Tile Layer Configuration (aligned with main app MAP.tile_layers)
+export interface TileLayerConfig {
+  name: string;
+  url: string;
+  attribution: string;
+}
+
+// Core Map Configuration (aligned with main app MAP structure)
 export interface MapConfig {
-  initialCenter: LatLngExpression;
-  initialZoom: number;
-  minZoom?: number;
-  maxZoom?: number;
-  tileLayerUrl?: string;
-  tileLayerAttribution?: string;
-  layers?: Layer[];
-  controls?: ControlsConfig;
-  features?: FeaturesConfig;
-  theme?: 'light' | 'dark' | 'auto';
-  plugins?: MapPlugin[];
-  events?: MapEvents;
+  map_settings: MapSettings;
+  default_tile_layer?: string;
+  default_attribution?: string;
+  tile_layers?: Record<string, TileLayerConfig>;
+  data_layers?: Record<string, DataLayer>;
+  controls_settings?: Record<string, ControlSetting>;
+  map_controls?: Record<string, ControlLayout>;
+}
+
+// Data Layer Configuration (aligned with main app MAP.data_layers)
+export interface DataLayer {
+  enabled: boolean;
+  visible: boolean;
+  label: string;
+  icon?: string;
+  refreshable: boolean;
+  count_key?: string;
+  translationKey?: string;
+  showLegend?: boolean;
+  offline_label?: string;
+  api_url?: string;
+}
+
+// Control Configuration (aligned with main app MAP.controls_settings)
+export interface ControlSetting {
+  enabled: boolean;
+  label: string;
+  icon?: string;
+  tooltip?: string;
+  shortcut?: string;
+  items?: string[]; // Array of layer IDs for layer_toggle control
+}
+
+// Control Layout (aligned with main app MAP.map_controls)
+export interface ControlLayout {
+  position: 'topright' | 'topleft' | 'bottomright' | 'bottomleft';
+  elements: ControlElement[];
+}
+
+export interface ControlElement {
+  type: 'toggle' | 'switch';
+  items: string[];
 }
 
 // Layer Types
@@ -188,11 +238,10 @@ export interface MeasurementResult {
   units: 'metric' | 'imperial';
 }
 
-// Main Component Props
+// Main Component Props (updated to use MAP structure)
 export interface InteractiveMapProps {
-  config: MapConfig;
-  layers: Layer[];
-  controls?: ControlsConfig;
+  mapConfig: MapConfig; // Uses MAP structure from settings
+  layers?: Layer[];
   features?: FeaturesConfig;
   events?: MapEvents;
   className?: string;

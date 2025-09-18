@@ -1,0 +1,1 @@
+export { useInstanceSettings, useSettings, useMapSettings } from './useInstanceSettings';
