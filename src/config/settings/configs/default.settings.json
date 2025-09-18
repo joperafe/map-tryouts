@@ -175,7 +175,8 @@
         "count_key": "airQualityStations",
         "translationKey": "DASHBOARD_MAP_LAYERS_PANEL_AIR_QUALITY_COUNT",
         "showLegend": true,
-        "offline_label": "DASHBOARD_MAP_LAYERS_PANEL_OFFLINE_DATA"
+        "offline_label": "DASHBOARD_MAP_LAYERS_PANEL_OFFLINE_DATA",
+        "api_url": "https://broker.fiware.urbanplatform.portodigital.pt/v2/entities?type=AirQualityObserved"
       },
       "heatmap": {
         "enabled": true,

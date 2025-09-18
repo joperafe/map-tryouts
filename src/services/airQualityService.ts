@@ -9,170 +9,34 @@ const FIWARE_ENDPOINT_DEV = '/api/fiware/v2/entities'; // Proxied through Vite
 const FIWARE_ENDPOINT_PROD = 'https://broker.fiware.urbanplatform.portodigital.pt/v2/entities';
 
 /**
- * Mock data for fallback when API is not available
- */
-const MOCK_AIR_QUALITY_DATA: AirQualityObservedRaw[] = [
-  {
-    id: 'urn:ngsi-ld:AirQualityObserved:Porto:Station:001',
-    type: 'AirQualityObserved',
-    location: {
-      type: 'geo:json',
-      value: {
-        type: 'Point',
-        coordinates: [-8.6291, 41.1579], // Porto center
-      },
-      metadata: {},
-    },
-    dateObserved: {
-      type: 'DateTime',
-      value: new Date().toISOString(),
-      metadata: {},
-    },
-    pm25: {
-      type: 'Number',
-      value: 15.2,
-      metadata: {},
-    },
-    pm10: {
-      type: 'Number',
-      value: 22.8,
-      metadata: {},
-    },
-    no2: {
-      type: 'Number',
-      value: 38.5,
-      metadata: {},
-    },
-    o3: {
-      type: 'Number',
-      value: 65.1,
-      metadata: {},
-    },
-    co: {
-      type: 'Number',
-      value: 2.1,
-      metadata: {},
-    },
-    temperature: {
-      type: 'Number',
-      value: 18.5,
-      metadata: {},
-    },
-    humidity: {
-      type: 'Number',
-      value: 72.3,
-      metadata: {},
-    },
-  },
-  {
-    id: 'urn:ngsi-ld:AirQualityObserved:Porto:Station:002',
-    type: 'AirQualityObserved',
-    location: {
-      type: 'geo:json',
-      value: {
-        type: 'Point',
-        coordinates: [-8.6100, 41.1400], // Porto southeast
-      },
-      metadata: {},
-    },
-    dateObserved: {
-      type: 'DateTime',
-      value: new Date(Date.now() - 30 * 60000).toISOString(), // 30 minutes ago
-      metadata: {},
-    },
-    pm25: {
-      type: 'Number',
-      value: 25.7,
-      metadata: {},
-    },
-    pm10: {
-      type: 'Number',
-      value: 42.3,
-      metadata: {},
-    },
-    no2: {
-      type: 'Number',
-      value: 55.2,
-      metadata: {},
-    },
-    o3: {
-      type: 'Number',
-      value: 48.9,
-      metadata: {},
-    },
-    co: {
-      type: 'Number',
-      value: 3.4,
-      metadata: {},
-    },
-  },
-  {
-    id: 'urn:ngsi-ld:AirQualityObserved:Porto:Station:003',
-    type: 'AirQualityObserved',
-    location: {
-      type: 'geo:json',
-      value: {
-        type: 'Point',
-        coordinates: [-8.6500, 41.1700], // Porto northwest
-      },
-      metadata: {},
-    },
-    dateObserved: {
-      type: 'DateTime',
-      value: new Date(Date.now() - 2 * 60 * 60000).toISOString(), // 2 hours ago
-      metadata: {},
-    },
-    pm25: {
-      type: 'Number',
-      value: 8.1,
-      metadata: {},
-    },
-    pm10: {
-      type: 'Number',
-      value: 18.5,
-      metadata: {},
-    },
-    no2: {
-      type: 'Number',
-      value: 28.7,
-      metadata: {},
-    },
-    o3: {
-      type: 'Number',
-      value: 78.2,
-      metadata: {},
-    },
-    co: {
-      type: 'Number',
-      value: 1.2,
-      metadata: {},
-    },
-    temperature: {
-      type: 'Number',
-      value: 19.8,
-      metadata: {},
-    },
-    humidity: {
-      type: 'Number',
-      value: 68.1,
-      metadata: {},
-    },
-  },
-];
-
-/**
  * Service for fetching and processing air quality data from FIWARE broker
  */
 export class AirQualityService {
   /**
-   * Fetch raw air quality data from FIWARE broker with fallback
+   * Load mock data from JSON file
    */
-  static async fetchRawData(): Promise<AirQualityObservedRaw[]> {
+  private static async loadMockData(): Promise<AirQualityObservedRaw[]> {
+    try {
+      const response = await axios.get('/air-quality.mock.json');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to load mock air quality data:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Fetch raw air quality data from FIWARE broker
+   * @param customUrl Optional custom URL to fetch data from (overrides default endpoints)
+   */
+  static async fetchRawData(customUrl?: string): Promise<AirQualityObservedRaw[]> {
     // TEMPORARY: Force use mock data to test rendering
     console.log('🔧🔧🔧 [FORCED DEBUG] Using mock data instead of API - CHECK IF MARKERS APPEAR! 🔧🔧🔧');
-    console.log('📍 Mock data stations count:', MOCK_AIR_QUALITY_DATA.length);
-    return MOCK_AIR_QUALITY_DATA;
-    const endpoint = import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD;
+    const mockData = await this.loadMockData();
+    console.log('📍 Mock data stations count:', mockData.length);
+    return mockData;
+    
+    const endpoint = customUrl || (import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD);
 
     try {
       console.log(`Attempting to fetch air quality data from: ${endpoint}`);
@@ -191,7 +55,7 @@ export class AirQualityService {
       // Check if data is empty and provide fallback
       if (!response.data || response.data.length === 0) {
         console.warn('⚠️ [API] No air quality data received from FIWARE API, using fallback data');
-        return MOCK_AIR_QUALITY_DATA;
+        return await this.loadMockData();
       }
       
       console.log('🔍 [API] First station structure check:', response.data[0]);
@@ -202,8 +66,9 @@ export class AirQualityService {
       console.warn('Error fetching air quality data from API, using mock data:', error);
       
       // Use mock data as fallback
-      console.log(`Using mock air quality data (${MOCK_AIR_QUALITY_DATA.length} stations)`);
-      return MOCK_AIR_QUALITY_DATA;
+      const mockData = await this.loadMockData();
+      console.log(`Using mock air quality data (${mockData.length} stations)`);
+      return mockData;
     }
   }
 
@@ -344,9 +209,10 @@ export class AirQualityService {
 
   /**
    * Fetch and normalize air quality data
+   * @param customUrl Optional custom URL to fetch data from (overrides default endpoints)
    */
-  static async getAirQualityStations(): Promise<AirQualityStation[]> {
-    const rawData = await this.fetchRawData();
+  static async getAirQualityStations(customUrl?: string): Promise<AirQualityStation[]> {
+    const rawData = await this.fetchRawData(customUrl);
     return this.normalizeData(rawData);
   }
 }

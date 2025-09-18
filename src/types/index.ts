@@ -85,6 +85,7 @@ export interface MapDataLayer {
   translationKey?: string;
   showLegend?: boolean;
   offline_label?: string;
+  api_url?: string;
 }
 
 export interface MapControlLayout {

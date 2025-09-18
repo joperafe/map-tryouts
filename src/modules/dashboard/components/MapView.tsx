@@ -464,6 +464,10 @@ export const MapView: React.FC<MapViewProps> = ({
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1">
+              {/* Backend data indicator - show blinking red dot for layers with real API URLs */}
+              {layerConfig.api_url && (
+                <span className="backend-data-indicator"></span>
+              )}
               {layerConfig.icon && <span>{layerConfig.icon}</span>}
               {layerConfig.translationKey 
                 ? t(layerConfig.translationKey, { count: Array.isArray(data) ? data.length : 0 })

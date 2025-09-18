@@ -109,6 +109,27 @@
     @apply bg-red-500;
   }
   
+  /* Backend data indicator - blinking red dot */
+  .backend-data-indicator {
+    width: 0.5rem; /* 8px = w-2 */
+    height: 0.5rem; /* 8px = h-2 */
+    background-color: #ef4444; /* bg-red-500 */
+    border-radius: 9999px; /* rounded-full */
+    margin-right: 0.5rem; /* mr-2 */
+    flex-shrink: 0;
+    display: inline-block;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0.3;
+    }
+  }
+  
   .popup-content {
     @apply p-0;
   }
