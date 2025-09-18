@@ -1,0 +1,91 @@
+import type { MapConfig } from '../types';
+
+/**
+ * Utility to adapt MAP configuration from main app settings to microservice format
+ * This ensures compatibility between the main application's settings structure
+ * and the microservice's expected configuration format.
+ */
+
+/**
+ * Type for the main application's MAP configuration structure
+ * This should match the AppConfig.MAP interface from the main app
+ */
+export interface MainAppMapConfig {
+  controls_settings: Record<string, any>;
+  map_controls: Record<string, any>;
+  map_settings: {
+    center: number[];
+    zoom: number;
+    maxZoom: number;
+    minZoom: number;
+    scrollWheelZoom?: boolean;
+    doubleClickZoom?: boolean;
+    boxZoom?: boolean;
+    keyboard?: boolean;
+    displayControlLabel?: boolean;
+  };
+  data_layers?: Record<string, any>;
+  default_tile_layer?: string;
+  default_attribution?: string;
+  tile_layers?: Record<string, {
+    name: string;
+    url: string;
+    attribution: string;
+  }>;
+}
+
+/**
+ * Adapts the main application's MAP configuration to the microservice's expected format
+ * @param mainAppConfig - The MAP configuration from the main application
+ * @returns MapConfig compatible with the microservice
+ */
+export function adaptMapConfig(mainAppConfig: MainAppMapConfig): MapConfig {
+  return {
+    map_settings: {
+      center: mainAppConfig.map_settings.center,
+      zoom: mainAppConfig.map_settings.zoom,
+      maxZoom: mainAppConfig.map_settings.maxZoom,
+      minZoom: mainAppConfig.map_settings.minZoom,
+      scrollWheelZoom: mainAppConfig.map_settings.scrollWheelZoom,
+      doubleClickZoom: mainAppConfig.map_settings.doubleClickZoom,
+      boxZoom: mainAppConfig.map_settings.boxZoom,
+      keyboard: mainAppConfig.map_settings.keyboard,
+      displayControlLabel: mainAppConfig.map_settings.displayControlLabel,
+    },
+    default_tile_layer: mainAppConfig.default_tile_layer,
+    default_attribution: mainAppConfig.default_attribution,
+    tile_layers: mainAppConfig.tile_layers,
+    data_layers: mainAppConfig.data_layers,
+    controls_settings: mainAppConfig.controls_settings,
+    map_controls: mainAppConfig.map_controls,
+  };
+}
+
+/**
+ * Creates default map configuration for development/testing
+ * @returns Default MapConfig
+ */
+export function createDefaultMapConfig(): MapConfig {
+  return {
+    map_settings: {
+      center: [41.1579, -8.6291], // Porto, Portugal
+      zoom: 13,
+      maxZoom: 18,
+      minZoom: 5,
+      scrollWheelZoom: true,
+      doubleClickZoom: true,
+      boxZoom: true,
+      keyboard: true,
+      displayControlLabel: false,
+    },
+    default_tile_layer: 'openstreetmap',
+    default_attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    tile_layers: {
+      openstreetmap: {
+        name: 'OpenStreetMap',
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      },
+    },
+  };
+}
