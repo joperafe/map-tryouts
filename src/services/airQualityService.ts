@@ -17,7 +17,12 @@ export class AirQualityService {
    */
   private static async loadMockData(): Promise<AirQualityObservedRaw[]> {
     try {
-      const response = await axios.get('/air-quality.mock.json');
+      // Use the correct base path for production (GitHub Pages)
+      const basePath = import.meta.env.BASE_URL || '/';
+      const mockDataUrl = `${basePath}air-quality.mock.json`.replace('//', '/');
+      
+      console.log(`Loading mock air quality data from: ${mockDataUrl}`);
+      const response = await axios.get(mockDataUrl);
       return response.data;
     } catch (error) {
       console.error('Failed to load mock air quality data:', error);
@@ -30,12 +35,6 @@ export class AirQualityService {
    * @param customUrl Optional custom URL to fetch data from (overrides default endpoints)
    */
   static async fetchRawData(customUrl?: string): Promise<AirQualityObservedRaw[]> {
-    // TEMPORARY: Force use mock data to test rendering
-    console.log('🔧🔧🔧 [FORCED DEBUG] Using mock data instead of API - CHECK IF MARKERS APPEAR! 🔧🔧🔧');
-    const mockData = await this.loadMockData();
-    console.log('📍 Mock data stations count:', mockData.length);
-    return mockData;
-    
     const endpoint = customUrl || (import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD);
 
     try {

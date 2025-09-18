@@ -4,6 +4,7 @@ import type { Sensor, GreenZone } from '../types';
 import type { AirQualityStation } from '../types/airQuality';
 import { httpService } from '../services';
 import { AirQualityService } from '../services/airQualityService';
+import { useInstanceSettings } from '../hooks';
 
 // Types for the unified map data state
 interface MapDataState {
@@ -198,6 +199,7 @@ interface MapDataProviderProps {
 
 export const MapDataProvider: React.FC<MapDataProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(mapDataReducer, initialState);
+  const { instanceSettings } = useInstanceSettings();
 
   // Helper function to handle async operations with loading/error states
   const handleAsyncOperation = useCallback(async <T,>(
@@ -262,12 +264,15 @@ export const MapDataProvider: React.FC<MapDataProviderProps> = ({ children }) =>
   }, [handleAsyncOperation]);
 
   const refreshAirQuality = useCallback(async () => {
+    // Get the API URL from settings configuration
+    const airQualityApiUrl = instanceSettings?.MAP?.data_layers?.airQuality?.api_url;
+    
     await handleAsyncOperation(
-      () => AirQualityService.getAirQualityStations(),
+      () => AirQualityService.getAirQualityStations(airQualityApiUrl),
       'airQuality',
       (stations) => dispatch({ type: 'SET_AIR_QUALITY_STATIONS', payload: stations })
     );
-  }, [handleAsyncOperation]);
+  }, [handleAsyncOperation, instanceSettings]);
 
   const refreshAllLayers = useCallback(async () => {
     dispatch({ type: 'REFRESH_ALL_START' });
