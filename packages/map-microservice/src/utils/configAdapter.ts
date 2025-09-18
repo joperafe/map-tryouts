@@ -60,32 +60,3 @@ export function adaptMapConfig(mainAppConfig: MainAppMapConfig): MapConfig {
     map_controls: mainAppConfig.map_controls,
   };
 }
-
-/**
- * Creates default map configuration for development/testing
- * @returns Default MapConfig
- */
-export function createDefaultMapConfig(): MapConfig {
-  return {
-    map_settings: {
-      center: [41.1579, -8.6291], // Porto, Portugal
-      zoom: 13,
-      maxZoom: 18,
-      minZoom: 5,
-      scrollWheelZoom: true,
-      doubleClickZoom: true,
-      boxZoom: true,
-      keyboard: true,
-      displayControlLabel: false,
-    },
-    default_tile_layer: 'openstreetmap',
-    default_attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    tile_layers: {
-      openstreetmap: {
-        name: 'OpenStreetMap',
-        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      },
-    },
-  };
-}

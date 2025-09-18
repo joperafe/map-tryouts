@@ -2,12 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   InteractiveMap, 
-  createMarkerLayer, 
-  createHeatmapLayer,
-  mapPresets 
+  adaptMapConfig,
+  type MarkerLayer, 
+  type HeatmapLayer
 } from '../../packages/map-microservice/src';
 import { wifiHotspots, generateWiFiCoverageData, providerColors, wifiStats } from '../data/wifiData';
 import Navigation from '../components/Navigation';
+import { useInstanceSettings } from '../hooks';
 
 // WiFi Coverage Page Component
 export const WiFiCoveragePage: React.FC = () => {
@@ -15,6 +16,7 @@ export const WiFiCoveragePage: React.FC = () => {
   const [selectedProvider, setSelectedProvider] = useState<string>('all');
   const [showHeatmap, setShowHeatmap] = useState<boolean>(true);
   const [showHotspots, setShowHotspots] = useState<boolean>(true);
+  const { instanceSettings } = useInstanceSettings();
 
   // Filter hotspots by provider
   const filteredHotspots = useMemo(() => {
@@ -30,97 +32,59 @@ export const WiFiCoveragePage: React.FC = () => {
 
   // Configure map for WiFi visualization
   const mapConfig = useMemo(() => {
-    const config = mapPresets.dashboard();
-    config.initialCenter = [38.7223, -9.1393]; // Lisbon center
-    config.initialZoom = 12;
-    config.theme = 'auto';
-    
-    // Customize controls for WiFi analysis
-    config.controls = {
-      showZoom: true,
-      showFullscreen: true,
-      showLayers: true,
-      showMeasurement: true,
-      showDrawing: false, // Not needed for WiFi coverage
-    };
-
-    config.features = {
-      clickableMarkers: true,
-      draggableMarkers: false,
-      zoomOnMarkerClick: true,
-      clustering: false, // Show individual hotspots
-      drawing: { enabled: false },
-      measurement: { enabled: true, units: 'metric' }
-    };
-
-    return config;
-  }, []);
+    if (!instanceSettings) return null;
+    return adaptMapConfig(instanceSettings.MAP);
+  }, [instanceSettings]);
 
   // Create WiFi hotspot markers
   const hotspotLayer = useMemo(() => {
     if (!showHotspots) return null;
 
-    return createMarkerLayer(
-      'wifi-hotspots',
-      'WiFi Hotspots',
-      filteredHotspots.map(hotspot => ({
-        lat: hotspot.lat,
-        lng: hotspot.lng,
-        popup: `
-          <div class="p-3 min-w-64">
-            <h3 class="font-semibold text-lg mb-2">${hotspot.name}</h3>
-            <div class="space-y-1 text-sm">
-              <div class="flex justify-between">
-                <span>Provider:</span>
-                <span class="font-medium">${hotspot.provider}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Signal Strength:</span>
-                <span class="font-medium">${Math.round(hotspot.signalStrength * 100)}%</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Frequency:</span>
-                <span class="font-medium">${hotspot.frequency}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Type:</span>
-                <span class="font-medium">${hotspot.isPublic ? 'Public' : 'Private'}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Users:</span>
-                <span class="font-medium">${hotspot.currentUsers}/${hotspot.maxUsers}</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Speed:</span>
-                <span class="font-medium">${hotspot.speed.download}↓/${hotspot.speed.upload}↑ Mbps</span>
+    const markerLayer: MarkerLayer = {
+      id: 'wifi-hotspots',
+      name: 'WiFi Hotspots',
+      type: 'marker',
+      visible: true,
+      data: filteredHotspots.map(hotspot => ({
+        id: hotspot.id,
+        position: [hotspot.lat, hotspot.lng] as [number, number],
+        popup: {
+          content: `
+            <div class="p-3 min-w-64">
+              <h3 class="font-semibold text-lg mb-2">${hotspot.name}</h3>
+              <div class="space-y-1 text-sm">
+                <div class="flex justify-between">
+                  <span>Provider:</span>
+                  <span class="font-medium">${hotspot.provider}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Signal Strength:</span>
+                  <span class="font-medium">${Math.round(hotspot.signalStrength * 100)}%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Frequency:</span>
+                  <span class="font-medium">${hotspot.frequency}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Type:</span>
+                  <span class="font-medium">${hotspot.isPublic ? 'Public' : 'Private'}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Users:</span>
+                  <span class="font-medium">${hotspot.currentUsers}/${hotspot.maxUsers}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Speed:</span>
+                  <span class="font-medium">${hotspot.speed.download}↓/${hotspot.speed.upload}↑ Mbps</span>
+                </div>
               </div>
             </div>
-          </div>
-        `,
-        metadata: {
-          id: hotspot.id,
-          name: hotspot.name,
-          provider: hotspot.provider,
-          signalStrength: hotspot.signalStrength,
-          isPublic: hotspot.isPublic
+          `
         }
-      })),
-      {
-        icon: {
-          iconUrl: 'data:image/svg+xml;base64,' + btoa(`
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="${providerColors[filteredHotspots[0]?.provider] || providerColors.default}" stroke="white" stroke-width="2"/>
-              <path d="M12 15.5A3.5 3.5 0 0 0 8.5 12A3.5 3.5 0 0 0 5 8.5" stroke="white" stroke-width="2" fill="none"/>
-              <path d="M12 12A3 3 0 0 0 9 9A3 3 0 0 0 6 6" stroke="white" stroke-width="1.5" fill="none"/>
-              <circle cx="12" cy="12" r="1.5" fill="white"/>
-            </svg>
-          `),
-          iconSize: [24, 24],
-          iconAnchor: [12, 12],
-          popupAnchor: [0, -12]
-        }
-      }
-    );
+      }))
+    };
+
+    return markerLayer;
   }, [filteredHotspots, showHotspots]);
 
   // Create WiFi coverage heatmap
@@ -138,32 +102,32 @@ export const WiFiCoveragePage: React.FC = () => {
           ) || point.connectedHotspots.length === 0
         );
 
-    return createHeatmapLayer(
-      'wifi-coverage',
-      'WiFi Coverage Heatmap',
-      filteredCoverageData.map(point => ({
+    const heatmapLayer: HeatmapLayer = {
+      id: 'wifi-coverage',
+      name: 'WiFi Coverage Heatmap',
+      type: 'heatmap',
+      visible: true,
+      data: filteredCoverageData.map(point => ({
         lat: point.lat,
         lng: point.lng,
-        intensity: point.signalStrength,
-        metadata: { connectedHotspots: point.connectedHotspots }
+        intensity: point.signalStrength
       })),
-      {
-        config: {
-          radius: 30,
-          blur: 20,
-          maxZoom: 15,
-          gradient: {
-            0.1: '#3b82f6', // Blue for weak signal
-            0.3: '#06b6d4', // Cyan
-            0.5: '#10b981', // Emerald
-            0.7: '#f59e0b', // Amber
-            0.9: '#ef4444', // Red for strong signal
-            1.0: '#dc2626'  // Dark red for excellent signal
-          }
-        },
-        opacity: 0.6
+      config: {
+        radius: 30,
+        blur: 20,
+        maxZoom: 15,
+        gradient: {
+          0.1: '#3b82f6', // Blue for weak signal
+          0.3: '#06b6d4', // Cyan
+          0.5: '#10b981', // Emerald
+          0.7: '#f59e0b', // Amber
+          0.9: '#ef4444', // Red for strong signal
+          1.0: '#dc2626'  // Dark red for excellent signal
+        }
       }
-    );
+    };
+
+    return heatmapLayer;
   }, [showHeatmap, selectedProvider]);
 
   // Create layers array
@@ -173,6 +137,11 @@ export const WiFiCoveragePage: React.FC = () => {
     if (hotspotLayer) layerList.push(hotspotLayer);
     return layerList;
   }, [coverageHeatmap, hotspotLayer]);
+
+  // Early return after all hooks
+  if (!instanceSettings || !mapConfig) {
+    return <div>Loading...</div>;
+  }
 
   // Statistics cards data
   const statsCards = [
@@ -295,7 +264,7 @@ export const WiFiCoveragePage: React.FC = () => {
         
         <div style={{ height: '600px', width: '100%' }}>
           <InteractiveMap
-            config={mapConfig}
+            mapConfig={mapConfig}
             layers={layers}
             className="border border-gray-300 dark:border-gray-600 rounded-lg"
             style={{ 
