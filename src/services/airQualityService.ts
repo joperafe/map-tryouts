@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AirQualityObserved, AirQualityObservedKeyValue, AirQualityStation } from '../types/airQuality';
+import type { AirQualityObserved, AirQualityObservedKeyValue, AirQualityStation, NGSIAttribute } from '../types/airQuality';
 import { AIR_QUALITY_THRESHOLDS } from '../types/airQuality';
 
 /**
@@ -115,7 +115,8 @@ export class AirQualityService {
         const lastUpdated = new Date(dateObservedValue);
         
         // Extract measurements based on format
-        const extractValue = (prop: any) => isKeyValue ? prop : prop?.value;
+        const extractValue = (prop: number | NGSIAttribute<number> | undefined): number | undefined => 
+          isKeyValue ? prop as number : (prop as NGSIAttribute<number>)?.value;
         
         const measurements = {
           co: extractValue(station.co),

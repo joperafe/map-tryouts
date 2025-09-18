@@ -189,6 +189,7 @@ const mapDataReducer = (state: MapDataState, action: MapDataAction): MapDataStat
 };
 
 // Create context
+// eslint-disable-next-line react-refresh/only-export-components
 export const MapDataContext = createContext<MapDataContextType | undefined>(undefined);
 
 // Provider component
@@ -283,10 +284,16 @@ export const MapDataProvider: React.FC<MapDataProviderProps> = ({ children }) =>
     }
   }, [refreshSensors, refreshGreenZones, refreshAirQuality]);
 
-  // Initial data loading
+  // Initial data loading - runs only once on mount
   useEffect(() => {
-    refreshAllLayers();
-  }, [refreshAllLayers]); // Load data on mount
+    // Load data on mount without calling refreshAllLayers to avoid duplicate calls
+    Promise.allSettled([
+      refreshSensors(),
+      refreshGreenZones(), 
+      refreshAirQuality(),
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this only runs once on mount
 
   const contextValue: MapDataContextType = {
     ...state,
