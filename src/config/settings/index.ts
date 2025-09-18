@@ -19,9 +19,16 @@ const loadRuntimeConfig = async (): Promise<EnvironmentSettings> => {
     // Try to fetch from public directory (production/deployed environments)
     const response = await fetch(configPath);
     if (response.ok) {
+      // Check if response contains JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Expected JSON configuration, got: ${contentType}`);
+      }
       const config = await response.json();
       console.log(`✅ Loaded runtime configuration from ${configPath}`);
       return config as EnvironmentSettings;
+    } else {
+      throw new Error(`Failed to load configuration: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
     console.warn('⚠️ Failed to load runtime configuration, using build-time fallback:', error);

@@ -12,7 +12,14 @@ class HttpService {
       const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // For HTTP errors, don't try to parse response as JSON
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+      }
+
+      // Check if response contains JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Expected JSON response, got: ${contentType}`);
       }
 
       const data = await response.json();

@@ -17,10 +17,19 @@ export class AirQualityService {
    */
   private static async loadMockData(): Promise<AirQualityObservedRaw[]> {
     try {
-      const response = await axios.get('/air-quality.mock.json');
+      const response = await axios.get('/air-quality.mock.json', {
+        // Ensure we're expecting JSON and handle errors properly
+        validateStatus: (status) => status >= 200 && status < 300,
+        responseType: 'json'
+      });
       return response.data;
     } catch (error) {
       console.error('Failed to load mock air quality data:', error);
+      // Check if it's an axios error with a response
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
       return [];
     }
   }
