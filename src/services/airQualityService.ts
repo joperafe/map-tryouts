@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AirQualityObservedRaw, AirQualityStation } from '../types/airQuality';
+import type { AirQualityObserved, AirQualityObservedKeyValue, AirQualityStation } from '../types/airQuality';
 import { AIR_QUALITY_THRESHOLDS } from '../types/airQuality';
 
 /**
@@ -15,7 +15,7 @@ export class AirQualityService {
   /**
    * Load mock data from JSON file
    */
-  private static async loadMockData(): Promise<AirQualityObservedRaw[]> {
+  private static async loadMockData(): Promise<AirQualityObserved[]> {
     try {
       const response = await axios.get('/air-quality.mock.json', {
         // Ensure we're expecting JSON and handle errors properly
@@ -38,7 +38,7 @@ export class AirQualityService {
    * Fetch raw air quality data from FIWARE broker
    * @param customUrl Optional custom URL to fetch data from (overrides default endpoints)
    */
-  static async fetchRawData(customUrl?: string): Promise<AirQualityObservedRaw[]> {
+  static async fetchRawData(customUrl?: string): Promise<AirQualityObserved[]> {
     const endpoint = customUrl || (import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD);
 
     try {
@@ -76,33 +76,57 @@ export class AirQualityService {
   }
 
   /**
+   * Check if the data is in keyValue format (simplified) or full NGSI-LD format
+   */
+  private static isKeyValueFormat(station: AirQualityObserved): station is AirQualityObservedKeyValue {
+    // In keyValue format, location is directly a GeoJsonPoint, not wrapped in {type, value}
+    return 'coordinates' in station.location && typeof station.dateObserved === 'string';
+  }
+
+  /**
    * Transform raw FIWARE data into normalized air quality stations
    */
-  static normalizeData(rawData: AirQualityObservedRaw[]): AirQualityStation[] {
+  static normalizeData(rawData: AirQualityObserved[]): AirQualityStation[] {
     console.log('🔍 [NORMALIZE] Starting normalization with raw data length:', rawData.length);
     console.log('🔍 [NORMALIZE] First raw station sample:', JSON.stringify(rawData[0], null, 2));
     
     const normalized = rawData
       .filter(station => {
-        const hasLocation = station.location?.value?.coordinates;
-        console.log('🔍 [FILTER] Station', station.id, 'has location:', !!hasLocation);
+        const isKeyValue = this.isKeyValueFormat(station);
+        const hasLocation = isKeyValue 
+          ? station.location.coordinates 
+          : station.location.value?.coordinates;
+        console.log('🔍 [FILTER] Station', station.id, 'has location:', !!hasLocation, 'isKeyValue:', isKeyValue);
         return hasLocation;
       })
       .map(station => {
-        const [longitude, latitude] = station.location.value.coordinates;
-        const lastUpdated = new Date(station.dateObserved.value);
+        const isKeyValue = this.isKeyValueFormat(station);
         
-        // Extract measurements
+        // Extract coordinates based on format
+        const coordinates = isKeyValue 
+          ? station.location.coordinates 
+          : station.location.value.coordinates;
+        const [longitude, latitude] = coordinates;
+        
+        // Extract dateObserved based on format
+        const dateObservedValue = isKeyValue 
+          ? station.dateObserved
+          : station.dateObserved.value;
+        const lastUpdated = new Date(dateObservedValue);
+        
+        // Extract measurements based on format
+        const extractValue = (prop: any) => isKeyValue ? prop : prop?.value;
+        
         const measurements = {
-          co: station.co?.value,
-          no2: station.no2?.value,
-          o3: station.o3?.value,
-          pm1: station.pm1?.value,
-          pm10: station.pm10?.value,
-          pm25: station.pm25?.value,
-          temperature: station.temperature?.value,
-          humidity: station.humidity?.value,
-          so2: station.so2?.value,
+          co: extractValue(station.co),
+          no2: extractValue(station.no2),
+          o3: extractValue(station.o3),
+          pm1: extractValue(station.pm1),
+          pm10: extractValue(station.pm10),
+          pm25: extractValue(station.pm25),
+          temperature: extractValue(station.temperature),
+          humidity: extractValue(station.humidity),
+          so2: extractValue(station.so2),
         };
 
         // Calculate air quality index and level
