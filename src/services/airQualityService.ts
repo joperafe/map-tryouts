@@ -39,12 +39,6 @@ export class AirQualityService {
    * @param customUrl Optional custom URL to fetch data from (overrides default endpoints)
    */
   static async fetchRawData(customUrl?: string): Promise<AirQualityObservedRaw[]> {
-    // TEMPORARY: Force use mock data to test rendering
-    console.log('🔧🔧🔧 [FORCED DEBUG] Using mock data instead of API - CHECK IF MARKERS APPEAR! 🔧🔧🔧');
-    const mockData = await this.loadMockData();
-    console.log('📍 Mock data stations count:', mockData.length);
-    return mockData;
-    
     const endpoint = customUrl || (import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD);
 
     try {
