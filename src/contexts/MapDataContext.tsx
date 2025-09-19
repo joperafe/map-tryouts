@@ -42,6 +42,9 @@ interface MapDataState {
     airQuality: boolean;
     heatmap: boolean;
   };
+  
+  // Current base map
+  currentBaseMap: string;
 }
 
 // Action types for the reducer
@@ -52,6 +55,7 @@ type MapDataAction =
   | { type: 'SET_GREEN_ZONES'; payload: GreenZone[] }
   | { type: 'SET_AIR_QUALITY_STATIONS'; payload: AirQualityStation[] }
   | { type: 'SET_LAYER_VISIBILITY'; payload: { layer: keyof MapDataState['layersVisible']; visible: boolean } }
+  | { type: 'SET_BASE_MAP'; payload: string }
   | { type: 'REFRESH_ALL_START' }
   | { type: 'REFRESH_ALL_END' };
 
@@ -59,6 +63,7 @@ type MapDataAction =
 export interface MapDataContextType extends MapDataState {
   // Actions
   setLayerVisibility: (layer: keyof MapDataState['layersVisible'], visible: boolean) => void;
+  setBaseMap: (baseMapId: string) => void;
   refreshSensors: () => Promise<void>;
   refreshGreenZones: () => Promise<void>;
   refreshAirQuality: () => Promise<void>;
@@ -92,6 +97,7 @@ const initialState: MapDataState = {
     airQuality: true,
     heatmap: false,
   },
+  currentBaseMap: 'openstreetmap',
 };
 
 // Reducer function
@@ -166,6 +172,12 @@ const mapDataReducer = (state: MapDataState, action: MapDataAction): MapDataStat
         },
       };
     
+    case 'SET_BASE_MAP':
+      return {
+        ...state,
+        currentBaseMap: action.payload,
+      };
+    
     case 'REFRESH_ALL_START':
       return {
         ...state,
@@ -190,6 +202,7 @@ const mapDataReducer = (state: MapDataState, action: MapDataAction): MapDataStat
 };
 
 // Create context
+// eslint-disable-next-line react-refresh/only-export-components
 export const MapDataContext = createContext<MapDataContextType | undefined>(undefined);
 
 // Provider component
@@ -231,6 +244,10 @@ export const MapDataProvider: React.FC<MapDataProviderProps> = ({ children }) =>
   // Action functions
   const setLayerVisibility = (layer: keyof MapDataState['layersVisible'], visible: boolean) => {
     dispatch({ type: 'SET_LAYER_VISIBILITY', payload: { layer, visible } });
+  };
+
+  const setBaseMap = (baseMapId: string) => {
+    dispatch({ type: 'SET_BASE_MAP', payload: baseMapId });
   };
 
   const refreshSensors = useCallback(async () => {
@@ -288,14 +305,21 @@ export const MapDataProvider: React.FC<MapDataProviderProps> = ({ children }) =>
     }
   }, [refreshSensors, refreshGreenZones, refreshAirQuality]);
 
-  // Initial data loading
+  // Initial data loading - runs only once on mount
   useEffect(() => {
-    refreshAllLayers();
-  }, [refreshAllLayers]); // Load data on mount
+    // Load data on mount without calling refreshAllLayers to avoid duplicate calls
+    Promise.allSettled([
+      refreshSensors(),
+      refreshGreenZones(), 
+      refreshAirQuality(),
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this only runs once on mount
 
   const contextValue: MapDataContextType = {
     ...state,
     setLayerVisibility,
+    setBaseMap,
     refreshSensors,
     refreshGreenZones,
     refreshAirQuality,

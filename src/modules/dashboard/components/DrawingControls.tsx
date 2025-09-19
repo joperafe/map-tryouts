@@ -66,8 +66,6 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
         map.addControl(drawControlRef.current);
         controlAddedRef.current = true;
         
-        console.log('✅ Drawing control added to map');
-        
         // Force a map invalidation to ensure the control is rendered properly
         setTimeout(() => {
           map.invalidateSize();
@@ -78,7 +76,6 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
       const mapContainer = map.getContainer();
       if (mapContainer) {
         mapContainer.classList.add('drawing-active');
-        console.log('✅ Drawing CSS class added to map container');
       }
 
       // Handle drawing events
@@ -107,10 +104,8 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
         try {
           map.removeControl(drawControlRef.current);
           controlAddedRef.current = false;
-          console.log('🔴 Drawing control removed from map');
         } catch {
           // Control might not be on the map
-          console.warn('⚠️ Failed to remove drawing control from map');
         }
       }
 
@@ -118,7 +113,6 @@ export const DrawingControls: React.FC<DrawingControlsProps> = ({
       const mapContainer = map.getContainer();
       if (mapContainer) {
         mapContainer.classList.remove('drawing-active');
-        console.log('🔴 Drawing CSS class removed from map container');
       }
 
       // Remove event listeners

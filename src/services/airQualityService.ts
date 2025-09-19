@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AirQualityObservedRaw, AirQualityStation } from '../types/airQuality';
+import type { AirQualityObserved, AirQualityObservedKeyValue, AirQualityStation, NGSIAttribute } from '../types/airQuality';
 import { AIR_QUALITY_THRESHOLDS } from '../types/airQuality';
 
 /**
@@ -15,17 +15,21 @@ export class AirQualityService {
   /**
    * Load mock data from JSON file
    */
-  private static async loadMockData(): Promise<AirQualityObservedRaw[]> {
+  private static async loadMockData(): Promise<AirQualityObserved[]> {
     try {
-      // Use the correct base path for production (GitHub Pages)
-      const basePath = import.meta.env.BASE_URL || '/';
-      const mockDataUrl = `${basePath}air-quality.mock.json`.replace('//', '/');
-      
-      console.log(`Loading mock air quality data from: ${mockDataUrl}`);
-      const response = await axios.get(mockDataUrl);
+      const response = await axios.get('/air-quality.mock.json', {
+        // Ensure we're expecting JSON and handle errors properly
+        validateStatus: (status) => status >= 200 && status < 300,
+        responseType: 'json'
+      });
       return response.data;
     } catch (error) {
       console.error('Failed to load mock air quality data:', error);
+      // Check if it's an axios error with a response
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
       return [];
     }
   }
@@ -34,12 +38,10 @@ export class AirQualityService {
    * Fetch raw air quality data from FIWARE broker
    * @param customUrl Optional custom URL to fetch data from (overrides default endpoints)
    */
-  static async fetchRawData(customUrl?: string): Promise<AirQualityObservedRaw[]> {
+  static async fetchRawData(customUrl?: string): Promise<AirQualityObserved[]> {
     const endpoint = customUrl || (import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD);
 
     try {
-      console.log(`Attempting to fetch air quality data from: ${endpoint}`);
-      
       const response = await axios.get(endpoint, {
         params: {
           type: 'AirQualityObserved',
@@ -48,57 +50,73 @@ export class AirQualityService {
         },
         timeout: 10000,
       });
-
-      console.log(`Successfully fetched ${response.data.length} air quality stations`);
       
       // Check if data is empty and provide fallback
       if (!response.data || response.data.length === 0) {
-        console.warn('⚠️ [API] No air quality data received from FIWARE API, using fallback data');
+        console.warn('[AirQuality] No data received from FIWARE API, using fallback data');
         return await this.loadMockData();
       }
       
-      console.log('🔍 [API] First station structure check:', response.data[0]);
-      console.log('Sample API response:', response.data.slice(0, 1)); // Log first station for debugging
       return response.data;
       
     } catch (error) {
-      console.warn('Error fetching air quality data from API, using mock data:', error);
+      console.warn('[AirQuality] API request failed, using mock data:', error instanceof Error ? error.message : error);
       
       // Use mock data as fallback
       const mockData = await this.loadMockData();
-      console.log(`Using mock air quality data (${mockData.length} stations)`);
       return mockData;
     }
   }
 
   /**
+   * Check if the data is in keyValue format (simplified) or full NGSI-LD format
+   */
+  private static isKeyValueFormat(station: AirQualityObserved): station is AirQualityObservedKeyValue {
+    // In keyValue format, location is directly a GeoJsonPoint, not wrapped in {type, value}
+    return 'coordinates' in station.location && typeof station.dateObserved === 'string';
+  }
+
+  /**
    * Transform raw FIWARE data into normalized air quality stations
    */
-  static normalizeData(rawData: AirQualityObservedRaw[]): AirQualityStation[] {
-    console.log('🔍 [NORMALIZE] Starting normalization with raw data length:', rawData.length);
-    console.log('🔍 [NORMALIZE] First raw station sample:', JSON.stringify(rawData[0], null, 2));
-    
+  static normalizeData(rawData: AirQualityObserved[]): AirQualityStation[] {
     const normalized = rawData
       .filter(station => {
-        const hasLocation = station.location?.value?.coordinates;
-        console.log('🔍 [FILTER] Station', station.id, 'has location:', !!hasLocation);
+        const isKeyValue = this.isKeyValueFormat(station);
+        const hasLocation = isKeyValue 
+          ? station.location.coordinates 
+          : station.location.value?.coordinates;
         return hasLocation;
       })
       .map(station => {
-        const [longitude, latitude] = station.location.value.coordinates;
-        const lastUpdated = new Date(station.dateObserved.value);
+        const isKeyValue = this.isKeyValueFormat(station);
         
-        // Extract measurements
+        // Extract coordinates based on format
+        const coordinates = isKeyValue 
+          ? station.location.coordinates 
+          : station.location.value.coordinates;
+        const [longitude, latitude] = coordinates;
+        
+        // Extract dateObserved based on format
+        const dateObservedValue = isKeyValue 
+          ? station.dateObserved
+          : station.dateObserved.value;
+        const lastUpdated = new Date(dateObservedValue);
+        
+        // Extract measurements based on format
+        const extractValue = (prop: number | NGSIAttribute<number> | undefined): number | undefined => 
+          isKeyValue ? prop as number : (prop as NGSIAttribute<number>)?.value;
+        
         const measurements = {
-          co: station.co?.value,
-          no2: station.no2?.value,
-          o3: station.o3?.value,
-          pm1: station.pm1?.value,
-          pm10: station.pm10?.value,
-          pm25: station.pm25?.value,
-          temperature: station.temperature?.value,
-          humidity: station.humidity?.value,
-          so2: station.so2?.value,
+          co: extractValue(station.co),
+          no2: extractValue(station.no2),
+          o3: extractValue(station.o3),
+          pm1: extractValue(station.pm1),
+          pm10: extractValue(station.pm10),
+          pm25: extractValue(station.pm25),
+          temperature: extractValue(station.temperature),
+          humidity: extractValue(station.humidity),
+          so2: extractValue(station.so2),
         };
 
         // Calculate air quality index and level
@@ -117,12 +135,9 @@ export class AirQualityService {
           primaryPollutant,
         };
       });
-
-    console.log('🔍 [NORMALIZE] Normalized data:', normalized.length, 'stations processed');
-    console.log('🔍 [NORMALIZE] Sample normalized station:', JSON.stringify(normalized[0], null, 2));
     
     if (normalized.length === 0) {
-      console.error('⚠️ [NORMALIZE] No stations passed filtering! All stations filtered out.');
+      console.warn('[AirQuality] No stations passed filtering! Check data format.');
     }
     
     return normalized;

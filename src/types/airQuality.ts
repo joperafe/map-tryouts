@@ -45,6 +45,38 @@ export interface AirQualityObservedRaw {
 }
 
 /**
+ * Simplified key-value format returned when using options=keyValues
+ */
+export interface AirQualityObservedKeyValue {
+  id: string;
+  type: 'AirQualityObserved';
+  
+  // Location (required) - simplified format
+  location: GeoJsonPoint;
+  
+  // Timestamp - simplified format
+  dateObserved: string;
+  
+  // Air quality measurements (all optional) - simplified format
+  co?: number;      // Carbon Monoxide
+  no2?: number;     // Nitrogen Dioxide  
+  o3?: number;      // Ozone
+  pm1?: number;     // Particulate Matter 1μm
+  pm10?: number;    // Particulate Matter 10μm
+  pm25?: number;    // Particulate Matter 2.5μm
+  
+  // Additional measurements
+  temperature?: number;
+  humidity?: number;
+  so2?: number;     // Sulfur Dioxide
+}
+
+/**
+ * Union type to handle both formats
+ */
+export type AirQualityObserved = AirQualityObservedRaw | AirQualityObservedKeyValue;
+
+/**
  * Normalized air quality data for easier use in components
  */
 export interface AirQualityStation {

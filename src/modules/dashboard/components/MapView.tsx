@@ -12,6 +12,7 @@ import { MapEvents } from './MapEvents';
 import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
 import { useMapData } from '../../../contexts';
 import { useMapSettings } from '../../../hooks';
+import { useApp } from '../../../contexts';
 import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
 import type { Sensor, AppConfig } from '../../../types';
 import { getAirQualityColor } from '../../../utils';
@@ -38,6 +39,7 @@ export const MapView: React.FC<MapViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const mapSettings = useMapSettings();
+  const { debug } = useApp();
   
   // Get data from global context
   const { 
@@ -46,8 +48,27 @@ export const MapView: React.FC<MapViewProps> = ({
     airQualityStations, 
     loading, 
     errors, 
-    refreshAirQuality
+    refreshAirQuality,
+    currentBaseMap
   } = useMapData();
+  
+  // Get current tile layer configuration
+  const getCurrentTileLayer = () => {
+    const tileLayers = mapSettings?.tile_layers;
+    if (!tileLayers || !tileLayers[currentBaseMap]) {
+      // Fallback to default OpenStreetMap
+      return {
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      };
+    }
+    
+    const config = tileLayers[currentBaseMap] as { url: string; attribution: string };
+    return {
+      url: config.url,
+      attribution: config.attribution
+    };
+  };
   
   const [layersVisible, setLayersVisible] = useState({
     sensors: showSensors,
@@ -110,11 +131,6 @@ export const MapView: React.FC<MapViewProps> = ({
     // Add event listener when any mode is active
     if (drawingMode || measurementMode || showLayerPanel || isFullscreen) {
       document.addEventListener('keydown', handleKeyDown);
-      
-      // Add visual indicator that ESC can be used
-      if (drawingMode || measurementMode) {
-        console.log('Press ESC to exit current mode');
-      }
     }
 
     // Cleanup event listener
@@ -127,7 +143,6 @@ export const MapView: React.FC<MapViewProps> = ({
   useEffect(() => {
     const updateControlsDimensions = () => {
       if (mapControlsRef.current && mapContainerRef.current) {
-        console.log('mapControlsRef.current :: ', mapControlsRef.current);
         const controlsRect = mapControlsRef.current.getBoundingClientRect();
         const controlsHeight = controlsRect.height + 16; // Add some margin
         const controlsWidth = controlsRect.width + 16; // Add some margin
@@ -135,8 +150,6 @@ export const MapView: React.FC<MapViewProps> = ({
         // Set CSS custom properties for controls dimensions
         mapContainerRef.current.style.setProperty('--controls-height', `${controlsHeight}px`);
         mapContainerRef.current.style.setProperty('--controls-width', `${controlsWidth}px`);
-        
-        console.log('Controls dimensions updated:', { height: controlsHeight, width: controlsWidth });
       }
     };
 
@@ -218,30 +231,18 @@ export const MapView: React.FC<MapViewProps> = ({
   const toggleMeasurement = () => {
     setMeasurementMode(!measurementMode);
     setDrawingMode(false); // Disable drawing when measuring
-    if (measurementMode) {
-      console.log('Measurement mode disabled');
-    } else {
-      console.log('Measurement mode enabled - Click on the map to start measuring. Press ESC to exit.');
-    }
   };
 
   const handleDrawCreated = (layer: L.Layer) => {
     setDrawnItems(prev => [...prev, layer]);
-    console.log('Shape drawn:', layer);
   };
 
   const handleDrawDeleted = (layers: L.Layer[]) => {
     setDrawnItems(prev => prev.filter(item => !layers.includes(item)));
-    console.log('Shapes deleted:', layers);
   };
 
   const handleMeasurement = (result: { distance?: number; area?: number; coordinates: L.LatLng[] }) => {
     setMeasurementResult(result);
-    console.log('Measurement result:', {
-      distance: result.distance ? `${(result.distance / 1000).toFixed(2)} km` : undefined,
-      area: result.area ? `${(result.area / 1000000).toFixed(2)} km²` : undefined,
-      points: result.coordinates.length,
-    });
   };
 
   // Add Sensor handlers
@@ -340,6 +341,9 @@ export const MapView: React.FC<MapViewProps> = ({
         break;
       case 'refresh':
         handleRefreshAllLayers();
+        break;
+      case 'base_map_selector':
+        // This will be handled by the MapControls component as a dropdown
         break;
       default:
         console.warn(`Unknown control type: ${controlType}`);
@@ -580,8 +584,9 @@ export const MapView: React.FC<MapViewProps> = ({
         ref={mapRef}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={currentBaseMap} // Force re-render when base map changes
+          attribution={getCurrentTileLayer().attribution}
+          url={getCurrentTileLayer().url}
         />
 
         {/* Map Events Handler */}
@@ -694,8 +699,8 @@ export const MapView: React.FC<MapViewProps> = ({
             console.log('Air quality station clicked:', station.id);
           }}
         />
-        {/* Debug info for air quality */}
-        {layersVisible.airQuality && (
+        {/* Debug info for air quality - only show when debug is enabled */}
+        {layersVisible.airQuality && debug && (
           <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'red', color: 'white', padding: '10px', zIndex: 1000 }}>
             🔍 DEBUG: {airQualityStations.length} stations, visible: {layersVisible.airQuality.toString()}
           </div>

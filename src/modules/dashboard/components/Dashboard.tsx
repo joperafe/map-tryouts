@@ -22,9 +22,9 @@ export const Dashboard: React.FC = () => {
     refreshAllLayers 
   } = useMapData();
 
-  // Only log once when environment changes
+  // Trigger re-render when environment changes
   useEffect(() => {
-    console.log('🎯 Dashboard - Environment:', environment, 'Config:', runtimeConfig);
+    // Environment changed - component will re-render with new config
   }, [environment, runtimeConfig]);
 
   if (loading.sensors || loading.greenZones) {

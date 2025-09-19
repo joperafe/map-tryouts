@@ -21,6 +21,7 @@ export interface DataState {
   refreshAll: () => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DataContext = createContext<DataState | undefined>(undefined);
 
 interface DataProviderProps {

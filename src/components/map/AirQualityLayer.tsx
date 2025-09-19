@@ -18,20 +18,11 @@ export const AirQualityLayer: React.FC<AirQualityLayerProps> = ({
   visible,
   onStationClick,
 }) => {
-  // Debug logging
-  console.log('AirQualityLayer render:', { 
-    stationsCount: stations.length, 
-    visible, 
-    stations: stations.slice(0, 2) // Log first 2 stations for debugging
-  });
-
   if (!visible) {
-    console.log('AirQualityLayer: not visible, returning null');
     return null;
   }
 
   if (stations.length === 0) {
-    console.log('AirQualityLayer: no stations data, returning empty fragment');
     return <></>;
   }
 
