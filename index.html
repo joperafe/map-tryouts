@@ -24,14 +24,19 @@
           var path = parts[0]; // This is the path part (e.g., '/dashboard')
           var query = parts.slice(1).join('&'); // This is the query part (e.g., 'env=dev')
           
-          // Construct the proper URL with ? for query parameters
-          var newUrl = l.pathname.slice(0, -1) + path + (query ? '?' + query : '') + l.hash;
+          // For GitHub Pages, we need to maintain the base path (/map-tryouts/)
+          // Get the base path from current location (everything before the last slash)
+          var basePath = l.pathname.includes('/map-tryouts/') ? '/map-tryouts' : '';
+          
+          // Construct the proper URL with base path and ? for query parameters
+          var newUrl = basePath + path + (query ? '?' + query : '') + l.hash;
           
           console.log('🔧 SPA Redirect Debug:');
           console.log('- Original search:', l.search);
           console.log('- Decoded:', decoded);
           console.log('- Path:', path);
           console.log('- Query:', query);
+          console.log('- Base path:', basePath);
           console.log('- New URL:', newUrl);
           
           window.history.replaceState(null, null, newUrl);
