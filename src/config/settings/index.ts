@@ -1,5 +1,6 @@
 // Import the merged active configuration as fallback
 import activeConfigFallback from './active.settings.json';
+import { detectRuntimeEnvironment } from '../../utils/environmentDetector';
 
 export type Environment = 'DEV' | 'INT' | 'PROD';
 
@@ -8,6 +9,59 @@ const primaryConfig = activeConfigFallback as EnvironmentSettings;
 
 // Cache for runtime configuration (optional enhancement)
 let runtimeConfig: EnvironmentSettings | null = null;
+
+// Runtime environment overrides for dynamic switching
+const createEnvironmentOverrides = (env: string): Partial<EnvironmentSettings> => {
+  switch (env) {
+    case 'DEV':
+      return {
+        ENVIRONMENT: 'DEV' as Environment,
+        API: {
+          baseUrl: "/data" // Mock data for dev environment
+        },
+        DATA: {
+          sensors: "/data/sensors.mock.json",
+          greenzones: "/data/greenzones.mock.json"
+        },
+        FEATURES: {
+          enableHeatmap: true,
+          enableGreenZones: true
+        },
+        // Add dev-specific map controls
+        MAP: {
+          ...primaryConfig.MAP,
+          controls_settings: {
+            ...primaryConfig.MAP.controls_settings,
+            draw: { 
+              enabled: true,
+              label: "DASHBOARD_MAP_CONTROLS_DRAW",
+              icon: "✏️",
+              tooltip: "DASHBOARD_MAP_TOOLTIPS_DRAW"
+            },
+            measurement: { 
+              enabled: true,
+              label: "DASHBOARD_MAP_CONTROLS_MEASURE", 
+              icon: "📏",
+              tooltip: "DASHBOARD_MAP_TOOLTIPS_MEASURE"
+            }
+          }
+        }
+      };
+    case 'STAGING':
+      return {
+        ENVIRONMENT: 'STAGING' as Environment,
+        API: {
+          baseUrl: "https://staging-api.climate-app.com"
+        },
+        FEATURES: {
+          enableHeatmap: true,
+          enableGreenZones: false
+        }
+      };
+    default: // PROD
+      return {};
+  }
+};
 
 // Function to load configuration at runtime (async enhancement)
 const loadRuntimeConfig = async (): Promise<EnvironmentSettings> => {
@@ -196,7 +250,31 @@ export const getEnvironmentSettingsAsync = async (): Promise<EnvironmentSettings
 
 // Synchronous function for immediate access (always returns valid config)
 export const getEnvironmentSettings = (): EnvironmentSettings => {
-  return runtimeConfig || primaryConfig;
+  // Check for runtime environment switching
+  const runtimeEnv = detectRuntimeEnvironment();
+  const overrides = createEnvironmentOverrides(runtimeEnv);
+  
+  const baseConfig = runtimeConfig || primaryConfig;
+  
+  // Apply runtime environment overrides if we're switching environments
+  if (Object.keys(overrides).length > 0) {
+    console.log(`🔄 Applying runtime environment overrides for: ${runtimeEnv}`);
+    return {
+      ...baseConfig,
+      ...overrides,
+      // Deep merge MAP configuration
+      MAP: {
+        ...baseConfig.MAP,
+        ...(overrides.MAP || {}),
+        controls_settings: {
+          ...baseConfig.MAP.controls_settings,
+          ...(overrides.MAP?.controls_settings || {})
+        }
+      }
+    } as EnvironmentSettings;
+  }
+  
+  return baseConfig;
 };
 
 export const getCurrentEnvironment = (): Environment => {

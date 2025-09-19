@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, type ReactNode } from 'react';
 import { getConfig } from '../config';
+import { detectRuntimeEnvironment } from '../utils/environmentDetector';
 import type { AppConfig } from '../types';
 
 interface InstanceSettingsContextType {
@@ -19,6 +20,7 @@ export const InstanceSettingsProvider: React.FC<InstanceSettingsProviderProps> =
   const [instanceSettings, setInstanceSettings] = useState<AppConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentEnvironment, setCurrentEnvironment] = useState(() => detectRuntimeEnvironment());
 
   const loadSettings = async () => {
     try {
@@ -45,6 +47,36 @@ export const InstanceSettingsProvider: React.FC<InstanceSettingsProviderProps> =
     await loadSettings();
   };
 
+  // Listen for URL changes to detect environment switches
+  useEffect(() => {
+    const checkEnvironmentChange = () => {
+      const newEnvironment = detectRuntimeEnvironment();
+      if (newEnvironment !== currentEnvironment) {
+        console.log('🔄 Environment changed in InstanceSettings:', currentEnvironment, '→', newEnvironment);
+        setCurrentEnvironment(newEnvironment);
+        // Reload settings for the new environment
+        loadSettings();
+      }
+    };
+
+    // Check for environment changes on URL changes
+    const handlePopState = () => checkEnvironmentChange();
+    const handleHashChange = () => checkEnvironmentChange();
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
+
+    // Also check after any programmatic navigation (like SPA redirects)
+    const intervalId = setInterval(checkEnvironmentChange, 1000); // Check every second
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handleHashChange);
+      clearInterval(intervalId);
+    };
+  }, [currentEnvironment]);
+
+  // Initial load
   useEffect(() => {
     loadSettings();
   }, []);
