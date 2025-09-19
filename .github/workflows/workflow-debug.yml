@@ -1,0 +1,28 @@
+name: Workflow Debug
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Debug git branches
+      run: |
+        echo "=== Current branch ==="
+        git branch -a
+        echo ""
+        echo "=== Branch comparison ==="
+        git log --oneline main ^origin/release || echo "No differences"
+        echo ""
+        echo "=== Release branch status ==="
+        git checkout release
+        git log --oneline -5
