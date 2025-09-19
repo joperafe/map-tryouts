@@ -7,9 +7,12 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-# 🌍 Climate Data Visualization Dashboard
+# Climate Data Visualization Dashboard
 
-A modern React-based climate monitoring dashboard application that displays environmental data through an interactive map interface.
+A modern React TypeScript application for monitoring environmental data through interactive maps.
+
+## Recent Updates
+- ✅ Auto-merge workflow fixed and operational
 
 ![Climate Dashboard](https://img.shields.io/badge/React-18.2.0-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-3178C6?style=flat-square&logo=typescript)
