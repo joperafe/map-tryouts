@@ -31,12 +31,16 @@
             "items": ["layer_toggle"]
           },
           {
-            "type": "switch",
-            "items": ["add_sensor", "draw", "measurement"]
+            "type": "toggle",
+            "items": ["measurement"]
           },
           {
             "type": "toggle",
-            "items": ["fullscreen", "export"]
+            "items": ["fullscreen"]
+          },
+          {
+            "type": "toggle",
+            "items": ["base_map_selector"]
           }
         ]
       }
