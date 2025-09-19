@@ -5,7 +5,7 @@ import Navigation from '../../../components/Navigation';
 import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
 import { DebugToggle } from '../../../components/DebugToggle';
 import { useMapData } from '../../../contexts';
-import { useSensorLayers } from '../../../contexts';
+import { useSensorLayers } from '../../../contexts/useSensorLayers';
 import { useSettings } from '../../../hooks';
 import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 

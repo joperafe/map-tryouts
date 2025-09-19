@@ -11,7 +11,7 @@ import { TempSensorMarker } from './TempSensorMarker';
 import { MapEvents } from './MapEvents';
 import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
 import { useMapData } from '../../../contexts';
-import { useSensorLayers } from '../../../contexts';
+import { useSensorLayers } from '../../../contexts/useSensorLayers';
 import { useMapSettings } from '../../../hooks';
 import { useApp } from '../../../contexts';
 import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
