@@ -24,43 +24,23 @@ export function detectRuntimeEnvironment(): RuntimeEnvironment {
     return (buildEnv as RuntimeEnvironment) || 'PROD';
   }
 
-  // Debug logging for production
+  // Check URL parameters first
   const searchParams = window.location.search;
   const urlParams = new URLSearchParams(searchParams);
   const envParam = urlParams.get('env');
   
-  console.log('🔍 Environment Detection:');
-  console.log('- Full URL:', window.location.href);
-  console.log('- Search params:', searchParams);
-  console.log('- env param:', envParam);
-  console.log('- VITE_ENVIRONMENT:', import.meta.env.VITE_ENVIRONMENT);
-  console.log('- MODE:', import.meta.env.MODE);
-  
-  // Check URL parameters first
   if (envParam && (envParam.toUpperCase() === 'DEV' || envParam.toUpperCase() === 'STAGING')) {
-    const detectedEnv = envParam.toUpperCase() as RuntimeEnvironment;
-    console.log('- Detected from URL:', detectedEnv);
-    return detectedEnv;
+    return envParam.toUpperCase() as RuntimeEnvironment;
   }
   
   // Fallback to build-time environment
   const buildEnv = import.meta.env.VITE_ENVIRONMENT || import.meta.env.MODE;
   
   // Map Vite modes to our environments
-  if (buildEnv === 'development') {
-    console.log('- Detected from build (development):', 'DEV');
-    return 'DEV';
-  }
-  if (buildEnv === 'DEV') {
-    console.log('- Detected from build (DEV):', 'DEV');
-    return 'DEV';
-  }
-  if (buildEnv === 'STAGING') {
-    console.log('- Detected from build (STAGING):', 'STAGING');
-    return 'STAGING';
-  }
+  if (buildEnv === 'development') return 'DEV';
+  if (buildEnv === 'DEV') return 'DEV';
+  if (buildEnv === 'STAGING') return 'STAGING';
   
-  console.log('- Detected default:', 'PROD');
   return 'PROD';
 }
 

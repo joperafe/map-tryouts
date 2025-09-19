@@ -40,7 +40,7 @@ export function debugEnvironmentDetection() {
 
 // Auto-run debug in development
 // eslint-disable-next-line no-constant-condition
-if (import.meta.env.DEV || true) { // Enable temporarily for debugging production
+if (import.meta.env.DEV && false) { // Disabled for now to reduce console spam
   // Run after DOM is ready
   if (typeof window !== 'undefined') {
     if (document.readyState === 'loading') {
