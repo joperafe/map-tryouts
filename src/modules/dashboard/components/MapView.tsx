@@ -11,6 +11,7 @@ import { TempSensorMarker } from './TempSensorMarker';
 import { MapEvents } from './MapEvents';
 import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
 import { useMapData } from '../../../contexts';
+import { useSensorLayers } from '../../../contexts';
 import { useMapSettings } from '../../../hooks';
 import { useApp } from '../../../contexts';
 import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
@@ -40,6 +41,7 @@ export const MapView: React.FC<MapViewProps> = ({
   const { t } = useTranslation();
   const mapSettings = useMapSettings();
   const { debug } = useApp();
+  const sensorLayers = useSensorLayers();
   
   // Get data from global context
   const { 
@@ -205,6 +207,45 @@ export const MapView: React.FC<MapViewProps> = ({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapSettings]);
+
+  // Sync sensor data with sensor layers state
+  useEffect(() => {
+    if (sensors.length > 0) {
+      sensorLayers.setSensorLayer('sensors', sensors);
+    }
+    sensorLayers.setLayerVisibility('sensors', layersVisible.sensors);
+    sensorLayers.setLayerLoading('sensors', loading.sensors);
+    if (errors.sensors) {
+      sensorLayers.setLayerError('sensors', errors.sensors);
+    }
+  }, [sensors, layersVisible.sensors, loading.sensors, errors.sensors, sensorLayers]);
+
+  // Sync air quality stations with sensor layers state
+  useEffect(() => {
+    if (airQualityStations.length > 0) {
+      // Convert air quality stations to sensor format for consistency
+      const airQualitySensors = airQualityStations.map(station => ({
+        id: station.id,
+        name: `Air Quality Station ${station.id}`,
+        coordinates: [station.latitude, station.longitude] as [number, number],
+        status: 'active' as const,
+        data: {
+          airQualityIndex: station.airQualityIndex,
+          temperature: station.measurements.temperature || 0,
+          humidity: station.measurements.humidity || 0,
+          noiseLevel: 0, // Air quality stations don't measure noise
+        },
+        lastUpdated: station.lastUpdated.toISOString(),
+        type: 'air_quality' as const
+      }));
+      sensorLayers.setSensorLayer('airQuality', airQualitySensors);
+    }
+    sensorLayers.setLayerVisibility('airQuality', layersVisible.airQuality);
+    sensorLayers.setLayerLoading('airQuality', loading.airQuality);
+    if (errors.airQuality) {
+      sensorLayers.setLayerError('airQuality', errors.airQuality);
+    }
+  }, [airQualityStations, layersVisible.airQuality, loading.airQuality, errors.airQuality, sensorLayers]);
 
   const toggleFullscreen = () => {
     if (!mapContainerRef.current) return;
