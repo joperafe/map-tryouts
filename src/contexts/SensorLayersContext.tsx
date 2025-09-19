@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import type { Sensor } from '../types';
 
@@ -96,6 +96,7 @@ const sensorLayersReducer = (state: SensorLayersState, action: SensorLayersActio
       };
 
     case 'CLEAR_LAYER_SENSORS': {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { [action.payload.layerName]: _removed, ...remainingLayers } = state.layers;
       return {
         ...state,
@@ -142,6 +143,9 @@ interface SensorLayersContextValue {
 }
 
 const SensorLayersContext = createContext<SensorLayersContextValue | undefined>(undefined);
+
+// Export context for use in custom hook
+export { SensorLayersContext };
 
 // Provider component
 interface SensorLayersProviderProps {
@@ -232,15 +236,6 @@ export const SensorLayersProvider: React.FC<SensorLayersProviderProps> = ({ chil
       {children}
     </SensorLayersContext.Provider>
   );
-};
-
-// Custom hook to use the sensor layers context
-export const useSensorLayers = (): SensorLayersContextValue => {
-  const context = useContext(SensorLayersContext);
-  if (context === undefined) {
-    throw new Error('useSensorLayers must be used within a SensorLayersProvider');
-  }
-  return context;
 };
 
 // Export types for use in other components
