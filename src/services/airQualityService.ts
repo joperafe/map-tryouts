@@ -17,7 +17,11 @@ export class AirQualityService {
    */
   private static async loadMockData(): Promise<AirQualityObserved[]> {
     try {
-      const response = await axios.get('/air-quality.mock.json', {
+      // Use proper base path for production builds  
+      const basePath = import.meta.env.PROD ? '/map-tryouts' : '';
+      const mockDataUrl = `${basePath}/air-quality.mock.json`;
+      
+      const response = await axios.get(mockDataUrl, {
         // Ensure we're expecting JSON and handle errors properly
         validateStatus: (status) => status >= 200 && status < 300,
         responseType: 'json'
