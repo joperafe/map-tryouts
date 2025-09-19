@@ -70,6 +70,17 @@ export const MapView: React.FC<MapViewProps> = ({
     };
   };
   
+  // Helper functions for layer control management
+  const getLayerToggleItems = () => {
+    return mapSettings?.controls_settings.layer_toggle?.items;
+  };
+
+  // Helper to check if a layer control is enabled in the configuration
+  const isLayerControlEnabled = (layerId: string) => {
+    const layerToggleItems = getLayerToggleItems();
+    return layerToggleItems && layerToggleItems.includes(layerId);
+  };
+  
   const [layersVisible, setLayersVisible] = useState({
     sensors: showSensors,
     greenZones: showGreenZones,
@@ -181,6 +192,19 @@ export const MapView: React.FC<MapViewProps> = ({
       }
     }
   }, [drawingMode, measurementMode]);
+
+  // Update layer visibility when mapSettings change
+  useEffect(() => {
+    if (mapSettings) {
+      setLayersVisible(prev => ({
+        sensors: (isLayerControlEnabled('sensors') ?? false) && prev.sensors,
+        greenZones: (isLayerControlEnabled('greenZones') ?? false) && prev.greenZones,  
+        heatmap: (isLayerControlEnabled('heatmap') ?? false) && prev.heatmap,
+        airQuality: (isLayerControlEnabled('airQuality') ?? false) && prev.airQuality,
+      }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapSettings]);
 
   const toggleFullscreen = () => {
     if (!mapContainerRef.current) return;
@@ -394,11 +418,6 @@ export const MapView: React.FC<MapViewProps> = ({
   // Access data layers from mapSettings
   const getDataLayers = () => {
     return mapSettings?.data_layers;
-  };
-
-  // Get layer toggle items from mapSettings
-  const getLayerToggleItems = () => {
-    return mapSettings?.controls_settings.layer_toggle?.items;
   };
 
   // Helper to get the first control position (fallback to topright)
@@ -642,7 +661,7 @@ export const MapView: React.FC<MapViewProps> = ({
         )}
         
         {/* Sensors */}
-        {layersVisible.sensors && sensors.map(sensor => (
+        {layersVisible.sensors && isLayerControlEnabled('sensors') && sensors.map(sensor => (
           <Marker
             key={sensor.id}
             position={sensor.coordinates}
@@ -667,7 +686,7 @@ export const MapView: React.FC<MapViewProps> = ({
         ))}
 
         {/* Green Zones */}
-        {layersVisible.greenZones && greenZones.map(zone => (
+        {layersVisible.greenZones && isLayerControlEnabled('greenZones') && greenZones.map(zone => (
           <Polygon
             key={zone.id}
             positions={zone.polygon}
@@ -692,15 +711,17 @@ export const MapView: React.FC<MapViewProps> = ({
         ))}
 
         {/* Air Quality Stations */}
-        <AirQualityLayer
-          stations={airQualityStations}
-          visible={layersVisible.airQuality}
-          onStationClick={(station) => {
-            console.log('Air quality station clicked:', station.id);
-          }}
-        />
+        {isLayerControlEnabled('airQuality') && (
+          <AirQualityLayer
+            stations={airQualityStations}
+            visible={layersVisible.airQuality}
+            onStationClick={(station) => {
+              console.log('Air quality station clicked:', station.id);
+            }}
+          />
+        )}
         {/* Debug info for air quality - only show when debug is enabled */}
-        {layersVisible.airQuality && debug && (
+        {layersVisible.airQuality && isLayerControlEnabled('airQuality') && debug && (
           <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'red', color: 'white', padding: '10px', zIndex: 1000 }}>
             🔍 DEBUG: {airQualityStations.length} stations, visible: {layersVisible.airQuality.toString()}
           </div>
