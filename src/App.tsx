@@ -8,8 +8,10 @@ import './utils/testEnvironmentDetection'; // Test environment detection
 import './i18n';
 
 function App() {
-  // Simple basename for production deployment
+  // Match the Vite base path exactly for consistency
   const basename = import.meta.env.PROD ? '/map-tryouts' : '';
+  
+  console.log(`🔧 App: PROD=${import.meta.env.PROD}, basename=${basename}`);
   
   return (
     <AppProviders>

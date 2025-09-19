@@ -4,9 +4,12 @@ import { localeFormatter } from './src/plugins/locale-formatter'
 import { buildMetadata } from './src/plugins/build-metadata'
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  // Simple base path for production deployment
-  const basePath = process.env.NODE_ENV === 'production' ? '/map-tryouts/' : '/';
+export default defineConfig(({ mode, command }) => {
+  // Simple base path for production deployment - use both mode and command to detect production
+  const isProduction = mode === 'production' || command === 'build';
+  const basePath = isProduction ? '/map-tryouts/' : '/';
+
+  console.log(`🔧 Vite config: mode=${mode}, command=${command}, isProduction=${isProduction}, basePath=${basePath}`);
 
   return {
     base: basePath,
