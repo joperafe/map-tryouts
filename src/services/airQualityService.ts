@@ -42,8 +42,6 @@ export class AirQualityService {
     const endpoint = customUrl || (import.meta.env.DEV ? FIWARE_ENDPOINT_DEV : FIWARE_ENDPOINT_PROD);
 
     try {
-      console.log(`Attempting to fetch air quality data from: ${endpoint}`);
-      
       const response = await axios.get(endpoint, {
         params: {
           type: 'AirQualityObserved',
@@ -52,25 +50,20 @@ export class AirQualityService {
         },
         timeout: 10000,
       });
-
-      console.log(`Successfully fetched ${response.data.length} air quality stations`);
       
       // Check if data is empty and provide fallback
       if (!response.data || response.data.length === 0) {
-        console.warn('⚠️ [API] No air quality data received from FIWARE API, using fallback data');
+        console.warn('[AirQuality] No data received from FIWARE API, using fallback data');
         return await this.loadMockData();
       }
       
-      console.log('🔍 [API] First station structure check:', response.data[0]);
-      console.log('Sample API response:', response.data.slice(0, 1)); // Log first station for debugging
       return response.data;
       
     } catch (error) {
-      console.warn('Error fetching air quality data from API, using mock data:', error);
+      console.warn('[AirQuality] API request failed, using mock data:', error instanceof Error ? error.message : error);
       
       // Use mock data as fallback
       const mockData = await this.loadMockData();
-      console.log(`Using mock air quality data (${mockData.length} stations)`);
       return mockData;
     }
   }
@@ -87,16 +80,12 @@ export class AirQualityService {
    * Transform raw FIWARE data into normalized air quality stations
    */
   static normalizeData(rawData: AirQualityObserved[]): AirQualityStation[] {
-    console.log('🔍 [NORMALIZE] Starting normalization with raw data length:', rawData.length);
-    console.log('🔍 [NORMALIZE] First raw station sample:', JSON.stringify(rawData[0], null, 2));
-    
     const normalized = rawData
       .filter(station => {
         const isKeyValue = this.isKeyValueFormat(station);
         const hasLocation = isKeyValue 
           ? station.location.coordinates 
           : station.location.value?.coordinates;
-        console.log('🔍 [FILTER] Station', station.id, 'has location:', !!hasLocation, 'isKeyValue:', isKeyValue);
         return hasLocation;
       })
       .map(station => {
@@ -146,12 +135,9 @@ export class AirQualityService {
           primaryPollutant,
         };
       });
-
-    console.log('🔍 [NORMALIZE] Normalized data:', normalized.length, 'stations processed');
-    console.log('🔍 [NORMALIZE] Sample normalized station:', JSON.stringify(normalized[0], null, 2));
     
     if (normalized.length === 0) {
-      console.error('⚠️ [NORMALIZE] No stations passed filtering! All stations filtered out.');
+      console.warn('[AirQuality] No stations passed filtering! Check data format.');
     }
     
     return normalized;

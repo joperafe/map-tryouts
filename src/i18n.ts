@@ -16,21 +16,16 @@ const resources = {
 // Get the stored language preference or use environment default
 const getInitialLanguage = () => {
   const storedLanguage = localStorage.getItem('language');
-  console.log('i18n debug - storedLanguage:', storedLanguage);
   
   if (storedLanguage && isLanguageSupported(storedLanguage)) {
-    console.log('Using stored language:', storedLanguage);
     return storedLanguage;
   }
   
   const envLanguage = import.meta.env.VITE_DEFAULT_LANGUAGE;
-  console.log('i18n debug - envLanguage:', envLanguage);
   
   const defaultLang = getDefaultLanguage();
-  console.log('i18n debug - defaultLanguage:', defaultLang);
   
   const finalLanguage = envLanguage && isLanguageSupported(envLanguage) ? envLanguage : defaultLang;
-  console.log('i18n debug - finalLanguage:', finalLanguage);
   
   return finalLanguage;
 };

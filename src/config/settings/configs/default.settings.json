@@ -115,6 +115,14 @@
         "icon": "🔄",
         "tooltip": "DASHBOARD_MAP_TOOLTIPS_REFRESH",
         "shortcut": "R"
+      },
+      "base_map_selector": {
+        "enabled": true,
+        "label": "DASHBOARD_MAP_CONTROLS_BASE_MAP",
+        "icon": "🗺️",
+        "tooltip": "DASHBOARD_MAP_TOOLTIPS_BASE_MAP",
+        "shortcut": "B",
+        "items": ["openstreetmap", "satellite", "terrain", "cartodb_light", "cartodb_dark", "esri_world_street", "esri_world_topo"]
       }
     },
     "map_controls": {
@@ -132,6 +140,10 @@
           {
             "type": "toggle",
             "items": ["fullscreen", "export", "refresh"]
+          },
+          {
+            "type": "toggle",
+            "items": ["base_map_selector"]
           }
         ]
       }
@@ -197,8 +209,33 @@
       },
       "satellite": {
         "name": "Satellite",
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        "attribution": "&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+      },
+      "terrain": {
+        "name": "Terrain",
         "url": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-        "attribution": "&copy; <a href=\"https://www.opentopomap.org\">OpenTopoMap</a> contributors"
+        "attribution": "Map data: &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors, <a href=\"http://viewfinderpanoramas.org\">SRTM</a> | Map style: &copy; <a href=\"https://opentopomap.org\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)"
+      },
+      "cartodb_light": {
+        "name": "CartoDB Light",
+        "url": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>"
+      },
+      "cartodb_dark": {
+        "name": "CartoDB Dark",
+        "url": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        "attribution": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors &copy; <a href=\"https://carto.com/attributions\">CARTO</a>"
+      },
+      "esri_world_street": {
+        "name": "Esri Street Map",
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        "attribution": "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+      },
+      "esri_world_topo": {
+        "name": "Esri Topographic",
+        "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        "attribution": "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community"
       }
     }
   },

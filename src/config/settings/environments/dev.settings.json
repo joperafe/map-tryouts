@@ -38,6 +38,10 @@
           {
             "type": "toggle",
             "items": ["fullscreen", "export"]
+          },
+          {
+            "type": "toggle",
+            "items": ["base_map_selector"]
           }
         ]
       }

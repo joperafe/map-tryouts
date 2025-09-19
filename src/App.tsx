@@ -3,7 +3,6 @@ import { Dashboard } from './modules/dashboard';
 import { AppProviders } from './contexts';
 import WiFiCoveragePage from './pages/WiFiPage';
 import CockpitPage from './pages/CockpitPage';
-import { detectRuntimeEnvironment, getEnvironmentConfig } from './utils/environmentDetector';
 import './utils/debugEnvironment'; // Auto-run debug in development
 import './utils/testEnvironmentDetection'; // Test environment detection
 import './i18n';
@@ -11,15 +10,6 @@ import './i18n';
 function App() {
   // Simple basename for production deployment
   const basename = import.meta.env.PROD ? '/map-tryouts' : '';
-  const runtimeEnv = detectRuntimeEnvironment();
-  const envConfig = getEnvironmentConfig();
-  
-  console.log('🚀 App starting with basename:', basename);
-  console.log('🌍 Build Environment:', import.meta.env.VITE_ENVIRONMENT);
-  console.log('🎯 Runtime Environment:', runtimeEnv);
-  console.log('⚙️ Environment Config:', envConfig);
-  console.log('📍 Current location:', window.location.href);
-  console.log('� Current pathname:', window.location.pathname);
   
   return (
     <AppProviders>
@@ -33,19 +23,11 @@ function App() {
             Skip to main content
           </a>
           <Routes>
-            <Route path="/" element={
-              <>
-                {console.log('🏠 Root route matched, redirecting to /dashboard')}
-                <Navigate to="/dashboard" replace />
-              </>
-            } />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={
-              <>
-                {console.log('📊 Dashboard route matched')}
-                <main id="main-content" role="main">
-                  <Dashboard />
-                </main>
-              </>
+              <main id="main-content" role="main">
+                <Dashboard />
+              </main>
             } />
             <Route path="/cockpit" element={
               <main id="main-content" role="main">
