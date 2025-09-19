@@ -8,6 +8,9 @@ export { InstanceSettingsProvider } from './InstanceSettingsContext';
 
 // New unified map data context
 export { MapDataProvider } from './MapDataContext';
+
+// Sensor Layers Context
+export { SensorLayersProvider, useSensorLayers } from './SensorLayersContext';
 export { useMapData } from './useMapData';
 
 // Combined providers for cleaner App.tsx

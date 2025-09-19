@@ -1,5 +1,5 @@
 import React, { type ReactNode } from 'react';
-import { AppProvider, ThemeProvider, MapDataProvider, InstanceSettingsProvider } from './index';
+import { AppProvider, ThemeProvider, MapDataProvider, InstanceSettingsProvider, SensorLayersProvider } from './index';
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -15,7 +15,9 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <InstanceSettingsProvider>
         <ThemeProvider>
           <MapDataProvider>
-            {children}
+            <SensorLayersProvider>
+              {children}
+            </SensorLayersProvider>
           </MapDataProvider>
         </ThemeProvider>
       </InstanceSettingsProvider>
