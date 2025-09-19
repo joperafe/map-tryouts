@@ -1,9 +1,10 @@
 import React from 'react';
-import { getEnvironmentConfig, getEnvironmentUrls } from '../utils/environmentDetector';
+import { getEnvironmentUrls } from '../utils/environmentDetector';
+import { useRuntimeEnvironment } from '../utils/useRuntimeEnvironment';
 import { useApp } from '../contexts';
 
 export const EnvironmentIndicator: React.FC = () => {
-  const config = getEnvironmentConfig();
+  const { config } = useRuntimeEnvironment(); // Use the hook instead of direct call
   const urls = getEnvironmentUrls();
   const { debug } = useApp();
   
