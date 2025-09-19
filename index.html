@@ -16,9 +16,25 @@
       (function(l) {
         if (l.search[1] === '/' ) {
           var decoded = decodeURIComponent(l.search.slice(1));
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + decoded + l.hash
-          );
+          // Replace encoded ampersands back to proper format
+          decoded = decoded.replace(/~and~/g, '&');
+          
+          // Split the decoded string to separate path from query
+          var parts = decoded.split('&');
+          var path = parts[0]; // This is the path part (e.g., '/dashboard')
+          var query = parts.slice(1).join('&'); // This is the query part (e.g., 'env=dev')
+          
+          // Construct the proper URL with ? for query parameters
+          var newUrl = l.pathname.slice(0, -1) + path + (query ? '?' + query : '') + l.hash;
+          
+          console.log('🔧 SPA Redirect Debug:');
+          console.log('- Original search:', l.search);
+          console.log('- Decoded:', decoded);
+          console.log('- Path:', path);
+          console.log('- Query:', query);
+          console.log('- New URL:', newUrl);
+          
+          window.history.replaceState(null, null, newUrl);
         }
       }(window.location))
     </script>
