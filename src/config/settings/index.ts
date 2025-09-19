@@ -12,19 +12,16 @@ let runtimeConfig: EnvironmentSettings | null = null;
 
 // Runtime environment overrides for dynamic switching
 const createEnvironmentOverrides = (env: string): Partial<EnvironmentSettings> => {
-  // Determine the correct base path based on current environment
-  const basePath = import.meta.env.PROD ? '/map-tryouts' : '';
-  
   switch (env) {
     case 'DEV':
       return {
         ENVIRONMENT: 'DEV' as Environment,
         API: {
-          baseUrl: `${basePath}/data` // Mock data for dev environment with correct base path
+          baseUrl: "/data" // Mock data for dev environment
         },
         DATA: {
-          sensors: `${basePath}/data/sensors.mock.json`,
-          greenzones: `${basePath}/data/greenzones.mock.json`
+          sensors: "/data/sensors.mock.json",
+          greenzones: "/data/greenzones.mock.json"
         },
         FEATURES: {
           enableHeatmap: true,
