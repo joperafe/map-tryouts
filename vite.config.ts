@@ -5,11 +5,22 @@ import { buildMetadata } from './src/plugins/build-metadata'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode, command }) => {
-  // Simple base path for production deployment - use both mode and command to detect production
+  // Detect deployment target
+  const isVercel = process.env.VITE_DEPLOYMENT_TARGET === 'vercel' || process.env.VERCEL === '1';
+  const isGitHubPages = process.env.VITE_DEPLOYMENT_TARGET === 'github-pages';
   const isProduction = mode === 'production' || command === 'build';
-  const basePath = isProduction ? '/map-tryouts/' : '/';
+  
+  // Set base path based on deployment target
+  let basePath = '/';
+  if (isProduction) {
+    if (isVercel) {
+      basePath = '/'; // Vercel uses root path
+    } else if (isGitHubPages || (!isVercel && !process.env.VITE_DEPLOYMENT_TARGET)) {
+      basePath = '/map-tryouts/'; // Default to GitHub Pages for backward compatibility
+    }
+  }
 
-  console.log(`🔧 Vite config: mode=${mode}, command=${command}, isProduction=${isProduction}, basePath=${basePath}`);
+  console.log(`🔧 Vite config: mode=${mode}, command=${command}, isProduction=${isProduction}, isVercel=${isVercel}, isGitHubPages=${isGitHubPages}, basePath=${basePath}`);
 
   return {
     base: basePath,

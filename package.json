@@ -9,6 +9,8 @@
     "build:dev": "npm run config:dev && tsc -b && vite build",
     "build:int": "npm run config:int && tsc -b && vite build",
     "build:prod": "npm run config:prod && tsc -b && vite build",
+    "build:vercel": "npm run config:prod && tsc -b && cross-env VITE_DEPLOYMENT_TARGET=vercel vite build",
+    "build:github": "npm run config:prod && tsc -b && cross-env VITE_DEPLOYMENT_TARGET=github-pages vite build",
     "config:dev": "node scripts/build-config.js DEV",
     "config:int": "node scripts/build-config.js INT",
     "config:prod": "node scripts/build-config.js PROD",
@@ -28,6 +30,8 @@
     "push:unsafe:origin": "git push origin --no-verify",
     "push:unsafe:main": "git push origin main --no-verify",
     "deploy": "npm run build:prod && gh-pages -d dist",
+    "deploy:github": "npm run build:github && gh-pages -d dist",
+    "deploy:vercel": "vercel --prod",
     "prepare": "husky"
   },
   "dependencies": {
@@ -54,6 +58,7 @@
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.16",
+    "cross-env": "^10.0.0",
     "eslint": "^9.33.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^5.2.0",
