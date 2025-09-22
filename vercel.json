@@ -12,7 +12,19 @@
   },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/wifi", 
+      "destination": "/index.html"
+    },
+    {
+      "source": "/cockpit",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!api|_next|assets|favicon.ico|robots.txt|sitemap.xml).*)",
       "destination": "/index.html"
     }
   ],
