@@ -1,12 +1,11 @@
-import React from 'react';
 import { getEnvironmentUrls } from '../utils/environmentDetector';
 import { useRuntimeEnvironment } from '../utils/useRuntimeEnvironment';
-import { useApp } from '../contexts';
+import { useAppStore } from '../contexts/store';
 
-export const EnvironmentIndicator: React.FC = () => {
+export function EnvironmentIndicator() {
   const { config } = useRuntimeEnvironment(); // Use the hook instead of direct call
   const urls = getEnvironmentUrls();
-  const { debug } = useApp();
+  const { state: { auth: { debugMode: debug } } } = useAppStore();
   
   // Only show indicator if debug flag is enabled
   if (!debug) {

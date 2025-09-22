@@ -1,4 +1,3 @@
-import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import type { SensorType } from './AddSensorPanel';
@@ -48,13 +47,13 @@ const createSensorIcon = (sensorType: SensorType, size: number = 25) => {
   });
 };
 
-export const TempSensorMarker: React.FC<TempSensorMarkerProps> = ({
+export function TempSensorMarker({
   id,
   name,
   position,
   type,
   onRemove
-}) => {
+}: TempSensorMarkerProps) {
   return (
     <Marker
       position={position}

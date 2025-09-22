@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMapData } from '../../../contexts';
+import { useMapData } from '../../../contexts/store';
 import { useMapSettings } from '../../../hooks';
 import type { AppConfig } from '../../../types';
 
@@ -12,7 +12,7 @@ interface MapControlsProps {
   activeControls?: Set<string>;
 }
 
-const MapControlsComponent = React.forwardRef<HTMLDivElement, MapControlsProps>(({
+const MapControlsComponent = forwardRef<HTMLDivElement, MapControlsProps>(({
   controlsSettings,
   mapControls,
   mapSettings,
@@ -25,7 +25,7 @@ const MapControlsComponent = React.forwardRef<HTMLDivElement, MapControlsProps>(
   const [showBaseMapDropdown, setShowBaseMapDropdown] = useState(false);
 
   // Memoize the sorted active controls array to prevent unnecessary re-renders
-  const activeControlsArray = React.useMemo(() => 
+  const activeControlsArray = useMemo(() => 
     Array.from(activeControls).sort(), 
     [activeControls]
   );

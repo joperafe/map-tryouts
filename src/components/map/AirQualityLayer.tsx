@@ -1,4 +1,3 @@
-import React from 'react';
 import { CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import type { AirQualityStation } from '../../types/airQuality';
 import { AIR_QUALITY_COLORS } from '../../types/airQuality';
@@ -13,11 +12,11 @@ interface AirQualityLayerProps {
  * Air Quality Layer component for Leaflet map
  * Renders air quality monitoring stations as colored circles
  */
-export const AirQualityLayer: React.FC<AirQualityLayerProps> = ({
+export function AirQualityLayer({
   stations,
   visible,
   onStationClick,
-}) => {
+}: AirQualityLayerProps) {
   if (!visible) {
     return null;
   }
@@ -74,9 +73,9 @@ export const AirQualityLayer: React.FC<AirQualityLayerProps> = ({
 /**
  * Detailed popup content for air quality stations
  */
-const AirQualityStationPopup: React.FC<{ station: AirQualityStation }> = ({
+function AirQualityStationPopup({
   station,
-}) => {
+}: { station: AirQualityStation }) {
   const formatValue = (value: number | undefined, unit: string) => {
     return value !== undefined ? `${value.toFixed(1)} ${unit}` : 'N/A';
   };

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useState, useEffect, type ReactNode } from 'react';
 import { getConfig } from '../config';
 import { detectRuntimeEnvironment } from '../utils/environmentDetector';
 import type { AppConfig } from '../types';
@@ -16,7 +16,7 @@ interface InstanceSettingsProviderProps {
   children: ReactNode;
 }
 
-export const InstanceSettingsProvider: React.FC<InstanceSettingsProviderProps> = ({ children }) => {
+export function InstanceSettingsProvider({ children }: InstanceSettingsProviderProps) {
   const [instanceSettings, setInstanceSettings] = useState<AppConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

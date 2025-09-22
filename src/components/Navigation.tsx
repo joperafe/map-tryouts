@@ -1,10 +1,9 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from './ThemeToggle';
 import { LocaleSelector } from './LocaleSelector';
 
-export const Navigation: React.FC = () => {
+export function Navigation() {
   const location = useLocation();
   const { t } = useTranslation();
 

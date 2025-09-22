@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMapSettings } from '../../hooks';
 
@@ -14,11 +14,11 @@ interface BaseMapSelectorProps {
   className?: string;
 }
 
-export const BaseMapSelector: React.FC<BaseMapSelectorProps> = ({
+export function BaseMapSelector({
   currentBaseMap,
   onBaseMapChange,
   className = ''
-}) => {
+}: BaseMapSelectorProps) {
   const { t } = useTranslation();
   const mapSettings = useMapSettings();
   const [isOpen, setIsOpen] = useState(false);

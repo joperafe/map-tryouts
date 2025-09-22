@@ -1,13 +1,12 @@
-import React from 'react';
-import { useApp } from '../contexts';
+import { useAuth } from '../contexts/store';
 
-export const DebugToggle: React.FC = () => {
-  const { debug, setDebug } = useApp();
+export function DebugToggle() {
+  const { debugMode: debug, toggleDebugMode } = useAuth();
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <button
-        onClick={() => setDebug(!debug)}
+        onClick={toggleDebugMode}
         className={`px-4 py-2 rounded-lg shadow-lg font-medium transition-colors ${
           debug
             ? 'bg-red-500 text-white hover:bg-red-600'

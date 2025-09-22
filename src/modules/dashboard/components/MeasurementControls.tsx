@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -7,10 +7,10 @@ interface MeasurementControlsProps {
   onMeasurement?: (result: { distance?: number; area?: number; coordinates: L.LatLng[] }) => void;
 }
 
-export const MeasurementControls: React.FC<MeasurementControlsProps> = ({
+export function MeasurementControls({
   enabled,
   onMeasurement,
-}) => {
+}: MeasurementControlsProps) {
   const map = useMap();
   const isDrawingRef = useRef(false);
   const coordinatesRef = useRef<L.LatLng[]>([]);

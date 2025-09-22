@@ -1,4 +1,4 @@
-import type { MapConfig } from '../types';
+import type { MapConfig, ControlSetting, ControlLayout, DataLayer } from '../types';
 
 /**
  * Utility to adapt MAP configuration from main app settings to microservice format
@@ -11,8 +11,8 @@ import type { MapConfig } from '../types';
  * This should match the AppConfig.MAP interface from the main app
  */
 export interface MainAppMapConfig {
-  controls_settings: Record<string, any>;
-  map_controls: Record<string, any>;
+  controls_settings: Record<string, ControlSetting>;
+  map_controls: Record<string, ControlLayout>;
   map_settings: {
     center: number[];
     zoom: number;
@@ -24,7 +24,7 @@ export interface MainAppMapConfig {
     keyboard?: boolean;
     displayControlLabel?: boolean;
   };
-  data_layers?: Record<string, any>;
+  data_layers?: Record<string, DataLayer>;
   default_tile_layer?: string;
   default_attribution?: string;
   tile_layers?: Record<string, {

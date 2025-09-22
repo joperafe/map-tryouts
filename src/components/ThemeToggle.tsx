@@ -1,16 +1,19 @@
-import React from 'react';
-import { useTheme } from '../contexts/useTheme';
+import { useTheme } from '../contexts/store';
 
-export const ThemeToggle: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+export function ThemeToggle() {
+  const { setMode, isDarkMode } = useTheme();
+
+  const toggleTheme = () => {
+    setMode(isDarkMode ? 'light' : 'dark');
+  };
 
   return (
     <button
       onClick={toggleTheme}
       className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
     >
-      {theme === 'light' ? (
+      {!isDarkMode ? (
         // Moon icon for dark mode
         <svg
           className="w-5 h-5 text-gray-700 dark:text-gray-200"

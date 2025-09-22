@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -11,12 +11,12 @@ interface DrawingControlsProps {
   onDrawDeleted?: (layers: L.Layer[]) => void;
 }
 
-export const DrawingControls: React.FC<DrawingControlsProps> = ({
+export function DrawingControls({
   enabled,
   position = 'topright',
   onDrawCreated,
   onDrawDeleted,
-}) => {
+}: DrawingControlsProps) {
   const map = useMap();
   const drawControlRef = useRef<L.Control.Draw | null>(null);
   const drawnItemsRef = useRef<L.FeatureGroup | null>(null);

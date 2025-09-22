@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
@@ -10,10 +10,8 @@ import { AddSensorPanel, type NewSensorData } from './AddSensorPanel';
 import { TempSensorMarker } from './TempSensorMarker';
 import { MapEvents } from './MapEvents';
 import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
-import { useMapData } from '../../../contexts';
-import { useSensorLayers } from '../../../contexts/useSensorLayers';
+import { useMapData, useSensorLayers, useAppStore } from '../../../contexts/store';
 import { useMapSettings } from '../../../hooks';
-import { useApp } from '../../../contexts';
 import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
 import type { Sensor, AppConfig } from '../../../types';
 import { getAirQualityColor } from '../../../utils';
@@ -33,14 +31,14 @@ interface MapViewProps {
   showGreenZones?: boolean;
 }
 
-export const MapView: React.FC<MapViewProps> = ({
+export function MapView({
   mapConfig,
   showSensors = true,
   showGreenZones = true,
-}) => {
+}: MapViewProps) {
   const { t } = useTranslation();
   const mapSettings = useMapSettings();
-  const { debug } = useApp();
+  const { state: { auth: { debugMode: debug } } } = useAppStore();
   const sensorLayers = useSensorLayers();
   
   // Get data from global context
