@@ -1,5 +1,5 @@
 import React from 'react';
-import { DrawnShape } from '../types';
+import type { DrawnShape } from '../types';
 
 interface DrawingFeatureProps {
   tools: ('polygon' | 'polyline' | 'rectangle' | 'circle' | 'marker')[];

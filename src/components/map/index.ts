@@ -38,3 +38,9 @@ export type {
 // Utilities
 export { adaptMapConfig } from './utils/configAdapter';
 export type { MainAppMapConfig } from './utils/configAdapter';
+
+// Feature Components
+export { DrawingFeature } from './features/DrawingFeature';
+export { FullscreenFeature } from './features/FullscreenFeature'; 
+export { LayerControlFeature } from './features/LayerControlFeature';
+export { MeasurementFeature } from './features/MeasurementFeature';

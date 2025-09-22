@@ -4,8 +4,7 @@ import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
 import { EnvironmentIndicator } from '../../../components/EnvironmentIndicator';
 import { DebugToggle } from '../../../components/DebugToggle';
-import { useMapData } from '../../../contexts';
-import { useSensorLayers } from '../../../contexts/useSensorLayers';
+import { useMapData, useSensorLayers } from '../../../contexts/store';
 import { useSettings } from '../../../hooks';
 import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 
@@ -93,10 +92,10 @@ export const Dashboard: React.FC = () => {
               <button
                 onClick={() => sensorLayers.toggleSidebarCollapsed()}
                 className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={sensorLayers.state.collapsedSidebar ? "Open sensor panel" : "Close sensor panel"}
+                aria-label={sensorLayers.collapsedSidebar ? "Open sensor panel" : "Close sensor panel"}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {!sensorLayers.state.collapsedSidebar ? (
+                  {!sensorLayers.collapsedSidebar ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   ) : (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -108,7 +107,7 @@ export const Dashboard: React.FC = () => {
         </header>
 
         {/* Mobile/Desktop Sidebar Overlay */}
-        {!sensorLayers.state.collapsedSidebar && (
+        {!sensorLayers.collapsedSidebar && (
           <div className="fixed inset-0 z-50 flex">
             <div 
               className="fixed inset-0 bg-black bg-opacity-50 md:hidden"
@@ -283,7 +282,7 @@ export const Dashboard: React.FC = () => {
       {/* Desktop layout */}
       <div className="hidden md:flex h-screen">
         {/* Desktop Sidebar */}
-        {!sensorLayers.state.collapsedSidebar && (
+        {!sensorLayers.collapsedSidebar && (
           <aside className="sidebar w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto" role="complementary" aria-label="Dashboard information">
             <header className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 z-10">
               <div className="flex items-center justify-between">
@@ -414,7 +413,7 @@ export const Dashboard: React.FC = () => {
         )}
 
         {/* Collapse/Expand Button for Desktop */}
-        {sensorLayers.state.collapsedSidebar && (
+        {sensorLayers.collapsedSidebar && (
           <div className="flex flex-col">
             <button
               onClick={() => sensorLayers.setSidebarCollapsed(false)}

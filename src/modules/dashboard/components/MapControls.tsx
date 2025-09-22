@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMapData } from '../../../contexts';
+import { useMapData } from '../../../contexts/store';
 import { useMapSettings } from '../../../hooks';
 import type { AppConfig } from '../../../types';
 

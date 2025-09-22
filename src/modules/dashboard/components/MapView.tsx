@@ -10,10 +10,8 @@ import { AddSensorPanel, type NewSensorData } from './AddSensorPanel';
 import { TempSensorMarker } from './TempSensorMarker';
 import { MapEvents } from './MapEvents';
 import { AirQualityLayer } from '../../../components/map/AirQualityLayer';
-import { useMapData } from '../../../contexts';
-import { useSensorLayers } from '../../../contexts/useSensorLayers';
+import { useMapData, useSensorLayers, useAppStore } from '../../../contexts/store';
 import { useMapSettings } from '../../../hooks';
-import { useApp } from '../../../contexts';
 import { AIR_QUALITY_COLORS } from '../../../types/airQuality';
 import type { Sensor, AppConfig } from '../../../types';
 import { getAirQualityColor } from '../../../utils';
@@ -40,7 +38,7 @@ export const MapView: React.FC<MapViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const mapSettings = useMapSettings();
-  const { debug } = useApp();
+  const { state: { auth: { debugMode: debug } } } = useAppStore();
   const sensorLayers = useSensorLayers();
   
   // Get data from global context

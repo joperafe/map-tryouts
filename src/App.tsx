@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Dashboard } from './modules/dashboard';
-import { AppProviders } from './contexts';
+import { AppStoreProvider } from './contexts/store';
+import { InstanceSettingsProvider } from './contexts/InstanceSettingsContext';
 import WiFiCoveragePage from './pages/WiFiPage';
 import CockpitPage from './pages/CockpitPage';
 import './utils/debugEnvironment'; // Auto-run debug in development
@@ -14,7 +15,8 @@ function App() {
   console.log(`🔧 App: PROD=${import.meta.env.PROD}, basename=${basename}`);
   
   return (
-    <AppProviders>
+    <InstanceSettingsProvider>
+      <AppStoreProvider>
       <Router basename={basename}>
         <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
           {/* Skip to main content link for keyboard users */}
@@ -56,7 +58,8 @@ function App() {
           </Routes>
         </div>
       </Router>
-    </AppProviders>
+      </AppStoreProvider>
+    </InstanceSettingsProvider>
   );
 }
 

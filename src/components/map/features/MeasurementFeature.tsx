@@ -1,5 +1,5 @@
 import React from 'react';
-import { MeasurementResult } from '../types';
+import type { MeasurementResult } from '../types';
 
 interface MeasurementFeatureProps {
   units: 'metric' | 'imperial';

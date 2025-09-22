@@ -5,7 +5,7 @@ import {
   adaptMapConfig,
   type MarkerLayer, 
   type HeatmapLayer
-} from '../../packages/map-microservice/src';
+} from '../components/map';
 import { wifiHotspots, generateWiFiCoverageData, providerColors, wifiStats } from '../data/wifiData';
 import Navigation from '../components/Navigation';
 import { useInstanceSettings } from '../hooks';
