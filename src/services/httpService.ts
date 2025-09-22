@@ -1,3 +1,5 @@
+import axios from 'axios';
+import type { AxiosResponse } from 'axios';
 import type { Sensor, GreenZone, APIResponse } from '../types';
 
 class HttpService {
@@ -9,31 +11,30 @@ class HttpService {
 
   private async fetchWithErrorHandling<T>(url: string): Promise<APIResponse<T>> {
     try {
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        // For HTTP errors, don't try to parse response as JSON
-        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-      }
-
-      // Check if response contains JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error(`Expected JSON response, got: ${contentType}`);
-      }
-
-      const data = await response.json();
+      const response: AxiosResponse<T> = await axios.get(url, {
+        validateStatus: (status) => status >= 200 && status < 300,
+        responseType: 'json'
+      });
       
       return {
-        data,
+        data: response.data,
         success: true,
       };
     } catch (error) {
-      console.error('Fetch error:', error);
+      // Axios errors have a more specific structure
+      console.error('HTTP service error:', error);
+      
+      let errorMessage = 'Unknown error occurred';
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.message || error.message || `HTTP ${error.response?.status}: ${error.response?.statusText}`;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       return {
         data: null as T,
         success: false,
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        message: errorMessage,
       };
     }
   }
