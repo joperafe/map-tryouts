@@ -9,10 +9,21 @@ import './utils/testEnvironmentDetection'; // Test environment detection
 import './i18n';
 
 function App() {
-  // Match the Vite base path exactly for consistency
-  const basename = import.meta.env.PROD ? '/map-tryouts' : '';
+  // Determine basename based on deployment target
+  const getBasename = () => {
+    if (!import.meta.env.PROD) return ''; // Development always uses root
+    
+    // Check if we're on Vercel
+    const isVercel = import.meta.env.VITE_DEPLOYMENT_TARGET === 'vercel' || 
+                     typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+    
+    // Vercel uses root path, GitHub Pages uses /map-tryouts
+    return isVercel ? '' : '/map-tryouts';
+  };
   
-  console.log(`🔧 App: PROD=${import.meta.env.PROD}, basename=${basename}`);
+  const basename = getBasename();
+  
+  console.log(`🔧 App: PROD=${import.meta.env.PROD}, DEPLOYMENT_TARGET=${import.meta.env.VITE_DEPLOYMENT_TARGET}, hostname=${typeof window !== 'undefined' ? window.location.hostname : 'server'}, basename=${basename}`);
   
   return (
     <InstanceSettingsProvider>

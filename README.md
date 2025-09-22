@@ -42,7 +42,7 @@ A modern React TypeScript application for monitoring environmental data through 
 - **Internationalization**: react-i18next
 - **State Management**: React hooks (useState, useEffect, useContext)
 - **Testing**: Jest with React Testing Library
-- **Deployment**: GitHub Actions → GitHub Pages
+- **Deployment**: GitHub Pages + Vercel (dual platform support)
 
 ## 📋 Prerequisites
 
@@ -196,6 +196,22 @@ Development uses mock data files located in `public/data/`:
 ```
 
 ## 🚀 Deployment
+
+This application supports deployment to both **GitHub Pages** and **Vercel**. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+
+### Quick Start
+
+#### Vercel (Recommended)
+```bash
+npm run build:vercel
+npm run deploy:vercel
+```
+
+#### GitHub Pages 
+```bash
+npm run build:github  
+npm run deploy:github
+```
 
 ### GitHub Pages (Automatic) 
 
