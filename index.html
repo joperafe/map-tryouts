@@ -11,10 +11,27 @@
     <script>
       // Single Page Apps for GitHub Pages
       // https://github.com/rafgraph/spa-github-pages
-      // This script checks to see if a redirect is present in the query string,
-      // converts it back into the correct url and adds it to the browser's history using window.history.replaceState(...)
+      // Only run this script on GitHub Pages, not on Vercel or other platforms
       (function(l) {
-        if (l.search[1] === '/' ) {
+        // Detect if we're on GitHub Pages
+        var isGitHubPages = l.hostname === 'joperafe.github.io' || 
+                           l.hostname.includes('.github.io') ||
+                           l.pathname.includes('/map-tryouts/');
+        
+        // Detect if we're on Vercel (skip redirect script)
+        var isVercel = l.hostname.includes('vercel.app') || 
+                      l.hostname.includes('.vercel.app');
+        
+        console.log('🔧 Platform Detection:', {
+          hostname: l.hostname,
+          pathname: l.pathname,
+          isGitHubPages: isGitHubPages,
+          isVercel: isVercel,
+          search: l.search
+        });
+        
+        // Only process redirects for GitHub Pages
+        if (isGitHubPages && !isVercel && l.search[1] === '/' ) {
           var decoded = decodeURIComponent(l.search.slice(1));
           // Replace encoded ampersands back to proper format
           decoded = decoded.replace(/~and~/g, '&');
@@ -25,21 +42,21 @@
           var query = parts.slice(1).join('&'); // This is the query part (e.g., 'env=dev')
           
           // For GitHub Pages, we need to maintain the base path (/map-tryouts/)
-          // Get the base path from current location (everything before the last slash)
-          var basePath = l.pathname.includes('/map-tryouts/') ? '/map-tryouts' : '';
+          var basePath = '/map-tryouts';
           
           // Construct the proper URL with base path and ? for query parameters
           var newUrl = basePath + path + (query ? '?' + query : '') + l.hash;
           
-          console.log('🔧 SPA Redirect Debug:');
-          console.log('- Original search:', l.search);
-          console.log('- Decoded:', decoded);
-          console.log('- Path:', path);
-          console.log('- Query:', query);
-          console.log('- Base path:', basePath);
-          console.log('- New URL:', newUrl);
+          console.log('🔧 GitHub Pages SPA Redirect:', {
+            decoded: decoded,
+            path: path,
+            query: query,
+            newUrl: newUrl
+          });
           
           window.history.replaceState(null, null, newUrl);
+        } else if (isVercel) {
+          console.log('🔧 Vercel detected: Skipping SPA redirect script');
         }
       }(window.location))
     </script>
