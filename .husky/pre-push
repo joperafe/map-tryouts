@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+# Pre-push hook that runs validation checks
+# 
+# This hook is executed every time you run 'git push'
+# It will prevent the push if any validation checks fail
+#
+# To bypass these checks, use: git push --no-verify
+
+echo "🔍 Pre-push validation starting..."
+
+# Run the validation script
+node scripts/validate-push.js
+
+# Exit with the same code as the validation script
+exit $?
