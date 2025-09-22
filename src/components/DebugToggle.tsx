@@ -1,7 +1,6 @@
-import React from 'react';
 import { useAuth } from '../contexts/store';
 
-export const DebugToggle: React.FC = () => {
+export function DebugToggle() {
   const { debugMode: debug, toggleDebugMode } = useAuth();
 
   return (

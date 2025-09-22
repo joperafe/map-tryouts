@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import type { LatLng } from 'leaflet';
 
 export interface SensorType {
@@ -76,14 +76,14 @@ const SENSOR_TYPES: SensorType[] = [
   }
 ];
 
-export const AddSensorPanel: React.FC<AddSensorPanelProps> = ({
+export function AddSensorPanel({
   isOpen,
   onClose,
   onAddSensor,
   selectedPosition,
   isSelectingPosition,
   onPositionModeToggle
-}) => {
+}: AddSensorPanelProps) {
   const [selectedSensorType, setSelectedSensorType] = useState<SensorType | null>(null);
   const [sensorName, setSensorName] = useState('');
   const [step, setStep] = useState<'type' | 'details' | 'position'>('type');

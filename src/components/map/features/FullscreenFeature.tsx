@@ -1,9 +1,7 @@
-import React from 'react';
+/* interface FullscreenFeatureProps {
+  container: RefObject<HTMLDivElement>;
+} */
 
-interface FullscreenFeatureProps {
-  container: React.RefObject<HTMLDivElement>;
-}
-
-export const FullscreenFeature: React.FC<FullscreenFeatureProps> = () => {
+export function FullscreenFeature(/* _props: FullscreenFeatureProps */) {
   return null;
 };

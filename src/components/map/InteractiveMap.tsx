@@ -1,4 +1,3 @@
-import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -13,12 +12,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export const InteractiveMap: React.FC<InteractiveMapProps> = ({
+export function InteractiveMap({
   mapConfig,
   layers = [],
   className = '',
   style,
-}) => {
+}: InteractiveMapProps) {
   // Use layers from props or mapConfig data layers
   const mapLayers = layers.length > 0 ? layers : [];
 

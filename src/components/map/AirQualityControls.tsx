@@ -1,4 +1,3 @@
-import React from 'react';
 import type { AirQualityStation } from '../../types/airQuality';
 import { AIR_QUALITY_COLORS } from '../../types/airQuality';
 
@@ -16,7 +15,7 @@ interface AirQualityControlsProps {
 /**
  * Controls for the Air Quality layer
  */
-export const AirQualityControls: React.FC<AirQualityControlsProps> = ({
+export function AirQualityControls({
   visible,
   onToggleVisibility,
   stations,
@@ -25,7 +24,7 @@ export const AirQualityControls: React.FC<AirQualityControlsProps> = ({
   lastUpdated,
   onRefresh,
   className = '',
-}) => {
+}: AirQualityControlsProps) {
   const getStationCounts = () => {
     const counts = stations.reduce((acc, station) => {
       acc[station.qualityLevel] = (acc[station.qualityLevel] || 0) + 1;

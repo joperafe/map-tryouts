@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSensors } from '../modules/dashboard/hooks/useSensors';
 import Navigation from '../components/Navigation';
 import type { Sensor } from '../types';
@@ -22,7 +22,7 @@ interface SensorAlert {
   acknowledged: boolean;
 }
 
-export const CockpitPage: React.FC = () => {
+export function CockpitPage() {
   const { sensors, loading, error } = useSensors();
   const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null);
   const [commands, setCommands] = useState<SensorCommand[]>([]);

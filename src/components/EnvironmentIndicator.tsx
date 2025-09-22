@@ -1,9 +1,8 @@
-import React from 'react';
 import { getEnvironmentUrls } from '../utils/environmentDetector';
 import { useRuntimeEnvironment } from '../utils/useRuntimeEnvironment';
 import { useAppStore } from '../contexts/store';
 
-export const EnvironmentIndicator: React.FC = () => {
+export function EnvironmentIndicator() {
   const { config } = useRuntimeEnvironment(); // Use the hook instead of direct call
   const urls = getEnvironmentUrls();
   const { state: { auth: { debugMode: debug } } } = useAppStore();

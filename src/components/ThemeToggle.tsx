@@ -1,7 +1,6 @@
-import React from 'react';
 import { useTheme } from '../contexts/store';
 
-export const ThemeToggle: React.FC = () => {
+export function ThemeToggle() {
   const { setMode, isDarkMode } = useTheme();
 
   const toggleTheme = () => {

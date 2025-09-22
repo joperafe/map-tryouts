@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
@@ -8,7 +8,7 @@ import { useMapData, useSensorLayers } from '../../../contexts/store';
 import { useSettings } from '../../../hooks';
 import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 
-export const Dashboard: React.FC = () => {
+export function Dashboard() {
   const settings = useSettings();
   const { environment, config: runtimeConfig } = useRuntimeEnvironment();
   const sensorLayers = useSensorLayers();

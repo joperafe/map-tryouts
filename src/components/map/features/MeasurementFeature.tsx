@@ -1,13 +1,10 @@
-import React from 'react';
-import type { MeasurementResult } from '../types';
-
-interface MeasurementFeatureProps {
+/* interface MeasurementFeatureProps {
   units: 'metric' | 'imperial';
   showArea: boolean;
   showDistance: boolean;
   onMeasurement?: (result: MeasurementResult) => void;
-}
+} */
 
-export const MeasurementFeature: React.FC<MeasurementFeatureProps> = () => {
+export function MeasurementFeature(/* _props: MeasurementFeatureProps */) {
   return null;
 };

@@ -1,14 +1,11 @@
-import React from 'react';
-import type { DrawnShape } from '../types';
-
-interface DrawingFeatureProps {
+/* interface DrawingFeatureProps {
   tools: ('polygon' | 'polyline' | 'rectangle' | 'circle' | 'marker')[];
   style?: Record<string, unknown>;
   onDrawCreated?: (shape: DrawnShape) => void;
   onDrawDeleted?: (shapes: DrawnShape[]) => void;
-}
+} */
 
-export const DrawingFeature: React.FC<DrawingFeatureProps> = () => {
+export function DrawingFeature(/* _props: DrawingFeatureProps */) {
   // TODO: Implement drawing feature
   return null;
-};
+}

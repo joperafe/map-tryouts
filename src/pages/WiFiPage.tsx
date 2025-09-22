@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   InteractiveMap, 
@@ -11,7 +11,7 @@ import Navigation from '../components/Navigation';
 import { useInstanceSettings } from '../hooks';
 
 // WiFi Coverage Page Component
-export const WiFiCoveragePage: React.FC = () => {
+export function WiFiCoveragePage() {
   const { t } = useTranslation();
   const [selectedProvider, setSelectedProvider] = useState<string>('all');
   const [showHeatmap, setShowHeatmap] = useState<boolean>(true);

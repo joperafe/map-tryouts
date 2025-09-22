@@ -1,4 +1,4 @@
-import React, { useReducer, useMemo, useEffect } from 'react';
+import { useReducer, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AppState } from './types';
 import { appReducer, initialAppState } from './reducer';
@@ -10,10 +10,10 @@ interface AppStoreProviderProps {
   initialState?: Partial<AppState>;
 }
 
-export const AppStoreProvider: React.FC<AppStoreProviderProps> = ({ 
+export function AppStoreProvider({ 
   children, 
   initialState 
-}) => {
+}: AppStoreProviderProps) {
   // Merge provided initial state with default initial state
   const mergedInitialState = useMemo(() => ({
     ...initialAppState,

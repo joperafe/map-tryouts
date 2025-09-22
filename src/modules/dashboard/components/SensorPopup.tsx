@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Sensor } from '../../../types';
 import { formatTemperature, formatHumidity, formatAirQuality, formatNoiseLevel, formatLastUpdated, getAirQualityColor } from '../../../utils';
 
@@ -7,7 +6,7 @@ interface SensorPopupProps {
   onClose?: () => void;
 }
 
-export const SensorPopup: React.FC<SensorPopupProps> = ({ sensor }) => {
+export function SensorPopup({ sensor }: SensorPopupProps) {
   return (
     <div className="popup-content bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden min-w-[280px]">
       {/* Header */}

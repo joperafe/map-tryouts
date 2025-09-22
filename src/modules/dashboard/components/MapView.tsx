@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon } from 'react-leaflet';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
@@ -31,11 +31,11 @@ interface MapViewProps {
   showGreenZones?: boolean;
 }
 
-export const MapView: React.FC<MapViewProps> = ({
+export function MapView({
   mapConfig,
   showSensors = true,
   showGreenZones = true,
-}) => {
+}: MapViewProps) {
   const { t } = useTranslation();
   const mapSettings = useMapSettings();
   const { state: { auth: { debugMode: debug } } } = useAppStore();

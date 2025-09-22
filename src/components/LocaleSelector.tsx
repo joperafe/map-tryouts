@@ -1,8 +1,7 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { getSupportedLanguages, getLanguageByCode, isLanguageSupported } from '../config/languages';
 
-export const LocaleSelector: React.FC = () => {
+export function LocaleSelector() {
   const { i18n } = useTranslation();
   
   const supportedLanguages = getSupportedLanguages();
