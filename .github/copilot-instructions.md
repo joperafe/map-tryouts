@@ -63,7 +63,7 @@ src/
 - Use custom hooks for shared logic
 - Implement proper cleanup in useEffect
 - Handle loading, error, and success states consistently
-- Use React.memo() for expensive components
+- Use React.useMemo() for expensive components
 
 ### Map Integration
 - Use React-Leaflet components exclusively
@@ -86,7 +86,6 @@ src/
 - Show user-friendly error messages with translation support
 
 ### Performance Optimization
-- Use React.memo() for components that render frequently
 - Implement proper dependency arrays in useEffect
 - Lazy load components and data when appropriate
 - Optimize map rendering with conditional layer rendering
