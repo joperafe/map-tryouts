@@ -13,9 +13,13 @@ function App() {
   const getBasename = () => {
     if (!import.meta.env.PROD) return ''; // Development always uses root
     
-    // Check if we're on Vercel
+    // Check if we're on Vercel - be more specific about detection
     const isVercel = import.meta.env.VITE_DEPLOYMENT_TARGET === 'vercel' || 
-                     typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+                     (typeof window !== 'undefined' && (
+                       window.location.hostname.includes('vercel.app') ||
+                       window.location.hostname.includes('.vercel.app') ||
+                       window.location.hostname.includes('map-tryouts.vercel.app')
+                     ));
     
     // Vercel uses root path, GitHub Pages uses /map-tryouts
     return isVercel ? '' : '/map-tryouts';
@@ -62,7 +66,15 @@ function App() {
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     Current path: {window.location.pathname}
                   </p>
-                  <Navigate to="/dashboard" replace />
+                  <p className="text-xs text-gray-400 mb-4">
+                    Basename: {basename}
+                  </p>
+                  <button
+                    onClick={() => window.location.href = basename + '/dashboard'}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Go to Dashboard
+                  </button>
                 </section>
               </main>
             } />
