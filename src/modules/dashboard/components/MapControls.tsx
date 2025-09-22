@@ -12,7 +12,7 @@ interface MapControlsProps {
   activeControls?: Set<string>;
 }
 
-export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
+const MapControlsComponent = React.forwardRef<HTMLDivElement, MapControlsProps>(({
   controlsSettings,
   mapControls,
   mapSettings,
@@ -138,9 +138,6 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
 
   // Flatten all control items from all elements
   const allControlItems = primaryToolbar?.elements.flatMap(element => element.items) || [];
-  
-  console.log('MapControls: allControlItems:', allControlItems);
-  console.log('MapControls: controlsSettings keys:', Object.keys(controlsSettings));
 
   return (
     <section 
@@ -193,5 +190,21 @@ export const MapControls = React.forwardRef<HTMLDivElement, MapControlsProps>(({
           );
         })}
     </section>
+  );
+});
+
+// Memoize the component to prevent unnecessary re-renders
+export const MapControls = React.memo(MapControlsComponent, (prevProps, nextProps) => {
+  // Custom comparison function to avoid re-renders when activeControls Set is recreated with the same values
+  const prevActiveArray = Array.from(prevProps.activeControls || new Set()).sort();
+  const nextActiveArray = Array.from(nextProps.activeControls || new Set()).sort();
+  
+  return (
+    prevProps.controlsSettings === nextProps.controlsSettings &&
+    prevProps.mapControls === nextProps.mapControls &&
+    prevProps.mapSettings === nextProps.mapSettings &&
+    prevProps.onControlClick === nextProps.onControlClick &&
+    prevActiveArray.length === nextActiveArray.length &&
+    prevActiveArray.every((item, index) => item === nextActiveArray[index])
   );
 });
