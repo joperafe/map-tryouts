@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { LatLng } from 'leaflet';
 
 export interface SensorType {
@@ -84,6 +85,7 @@ export function AddSensorPanel({
   isSelectingPosition,
   onPositionModeToggle
 }: AddSensorPanelProps) {
+  const { t } = useTranslation();
   const [selectedSensorType, setSelectedSensorType] = useState<SensorType | null>(null);
   const [sensorName, setSensorName] = useState('');
   const [step, setStep] = useState<'type' | 'details' | 'position'>('type');
@@ -149,7 +151,7 @@ export function AddSensorPanel({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Add New Sensor
+              {t('SENSOR_PANEL_TITLE')}
             </h2>
             <button
               onClick={onClose}
@@ -165,15 +167,15 @@ export function AddSensorPanel({
           <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700/50">
             <div className="flex items-center space-x-2 text-sm">
               <div className={`px-2 py-1 rounded ${step === 'type' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-600'}`}>
-                1. Type
+                {t('SENSOR_PANEL_STEP_TYPE')}
               </div>
               <div className="w-4 h-px bg-gray-300"></div>
               <div className={`px-2 py-1 rounded ${step === 'details' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-600'}`}>
-                2. Details
+                {t('SENSOR_PANEL_STEP_DETAILS')}
               </div>
               <div className="w-4 h-px bg-gray-300"></div>
               <div className={`px-2 py-1 rounded ${step === 'position' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-600'}`}>
-                3. Position
+                {t('SENSOR_PANEL_STEP_POSITION')}
               </div>
             </div>
           </div>
@@ -183,7 +185,7 @@ export function AddSensorPanel({
             {step === 'type' && (
               <div>
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                  Select Sensor Type
+                  {t('SENSOR_PANEL_SELECT_TYPE')}
                 </h3>
                 <div className="space-y-3">
                   {SENSOR_TYPES.map((sensorType) => (
@@ -221,7 +223,7 @@ export function AddSensorPanel({
               <div>
                 <div className="mb-6">
                   <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Selected Sensor Type
+                    {t('SENSOR_PANEL_SELECTED_TYPE')}
                   </h3>
                   <div className={`p-3 rounded-lg border ${selectedSensorType.color}`}>
                     <div className="flex items-center space-x-3">
@@ -239,7 +241,7 @@ export function AddSensorPanel({
                       htmlFor="sensor-name-input"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Sensor Name
+                      {t('SENSOR_PANEL_NAME_LABEL')}
                     </label>
                     <input
                       id="sensor-name-input"
@@ -247,18 +249,18 @@ export function AddSensorPanel({
                       value={sensorName}
                       onChange={(e) => setSensorName(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="Enter sensor name"
+                      placeholder={t('SENSOR_PANEL_NAME_PLACEHOLDER')}
                       aria-describedby="sensor-name-help"
                       required
                     />
                     <p id="sensor-name-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      Choose a descriptive name for this sensor
+                      {t('SENSOR_PANEL_NAME_HELP')}
                     </p>
                   </div>
 
                   <fieldset>
                     <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Capabilities
+                      {t('SENSOR_PANEL_CAPABILITIES')}
                     </legend>
                     <div className="flex flex-wrap gap-2" role="list">
                       {selectedSensorType.capabilities.map((capability, index) => (
@@ -279,7 +281,7 @@ export function AddSensorPanel({
             {step === 'position' && (
               <div>
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                  Set Sensor Position
+                  {t('SENSOR_PANEL_SET_POSITION')}
                 </h3>
                 
                 <div className="space-y-4">
@@ -289,13 +291,13 @@ export function AddSensorPanel({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                        Position Selection
+                        {t('SENSOR_PANEL_POSITION_SELECTION')}
                       </span>
                     </div>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       {isSelectingPosition 
-                        ? 'Click on the map to select a position for your sensor'
-                        : 'Click the button below to start selecting a position on the map'
+                        ? t('SENSOR_PANEL_POSITION_SELECTING')
+                        : t('SENSOR_PANEL_POSITION_INSTRUCTION')
                       }
                     </p>
                   </div>
@@ -344,7 +346,7 @@ export function AddSensorPanel({
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
-                Back
+                {t('SENSOR_PANEL_BACK')}
               </button>
 
               {step === 'details' && (
@@ -353,7 +355,7 @@ export function AddSensorPanel({
                   disabled={!sensorName.trim()}
                   className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Next
+                  {t('SENSOR_PANEL_NEXT')}
                 </button>
               )}
 
@@ -363,7 +365,7 @@ export function AddSensorPanel({
                   disabled={!selectedPosition || !sensorName.trim()}
                   className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Add Sensor
+                  {t('SENSOR_PANEL_ADD_SENSOR')}
                 </button>
               )}
             </div>

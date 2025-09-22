@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { AirQualityStation } from '../../types/airQuality';
 import { AIR_QUALITY_COLORS } from '../../types/airQuality';
 
@@ -25,6 +26,7 @@ export function AirQualityControls({
   onRefresh,
   className = '',
 }: AirQualityControlsProps) {
+  const { t } = useTranslation();
   const getStationCounts = () => {
     const counts = stations.reduce((acc, station) => {
       acc[station.qualityLevel] = (acc[station.qualityLevel] || 0) + 1;
@@ -38,14 +40,14 @@ export function AirQualityControls({
     const now = new Date();
     const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
     
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (diffMinutes < 1) return t('AIR_QUALITY_JUST_NOW');
+    if (diffMinutes < 60) return t('AIR_QUALITY_MINUTES_AGO', { count: diffMinutes });
     
     const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return t('AIR_QUALITY_HOURS_AGO', { count: diffHours });
     
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return t('AIR_QUALITY_DAYS_AGO', { count: diffDays });
   };
 
   const stationCounts = getStationCounts();
@@ -70,7 +72,7 @@ export function AirQualityControls({
               htmlFor="air-quality-toggle" 
               className="text-sm font-medium text-gray-900 cursor-pointer"
             >
-              Air Quality
+              {t('AIR_QUALITY_LAYER')}
             </label>
           </div>
 
@@ -79,7 +81,7 @@ export function AirQualityControls({
             disabled={loading}
             className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-50 
                        disabled:cursor-not-allowed transition-colors"
-            title="Refresh air quality data"
+            title={t('AIR_QUALITY_REFRESH_TITLE')}
           >
             <svg
               className={`w-4 h-4 text-gray-600 ${loading ? 'animate-spin' : ''}`}
@@ -105,29 +107,29 @@ export function AirQualityControls({
             <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
-            <span>Error loading data</span>
+            <span>{t('AIR_QUALITY_ERROR_LOADING')}</span>
           </div>
         ) : loading ? (
           <div className="text-gray-600 text-sm flex items-center gap-2">
             <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent" />
-            <span>Loading stations...</span>
+            <span>{t('AIR_QUALITY_LOADING')}</span>
           </div>
         ) : (
           <div className="space-y-2">
             {/* Station count */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">
-                {totalStations} station{totalStations !== 1 ? 's' : ''}
+                {t('AIR_QUALITY_STATIONS_COUNT', { count: totalStations })}
               </span>
               <span className="text-gray-500">
-                {recentStations} recent
+                {t('AIR_QUALITY_RECENT_COUNT', { count: recentStations })}
               </span>
             </div>
 
             {/* Last updated */}
             {lastUpdated && (
               <div className="text-xs text-gray-500">
-                Updated {formatLastUpdated(lastUpdated)}
+                {t('AIR_QUALITY_UPDATED')} {formatLastUpdated(lastUpdated)}
               </div>
             )}
           </div>
@@ -138,7 +140,7 @@ export function AirQualityControls({
       {visible && totalStations > 0 && (
         <div className="p-3 border-t border-gray-200">
           <h4 className="text-xs font-medium text-gray-700 mb-2">
-            Air Quality Index
+            {t('AIR_QUALITY_INDEX')}
           </h4>
           <div className="space-y-1">
             {Object.entries(AIR_QUALITY_COLORS).map(([level, color]) => {
@@ -168,15 +170,15 @@ export function AirQualityControls({
             <div className="text-xs text-gray-500 space-y-1">
               <div className="flex justify-between">
                 <span>0-50</span>
-                <span>Good</span>
+                <span>{t('AIR_QUALITY_GOOD')}</span>
               </div>
               <div className="flex justify-between">
                 <span>51-100</span>
-                <span>Moderate</span>
+                <span>{t('AIR_QUALITY_MODERATE')}</span>
               </div>
               <div className="flex justify-between">
                 <span>101+</span>
-                <span>Unhealthy</span>
+                <span>{t('AIR_QUALITY_UNHEALTHY')}</span>
               </div>
             </div>
           </div>

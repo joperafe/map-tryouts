@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/store';
 
 export function DebugToggle() {
+  const { t } = useTranslation();
   const { debugMode: debug, toggleDebugMode } = useAuth();
 
   return (
@@ -12,9 +14,9 @@ export function DebugToggle() {
             ? 'bg-red-500 text-white hover:bg-red-600'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
         }`}
-        title={`${debug ? 'Disable' : 'Enable'} debug mode`}
+        title={`${debug ? t('DEBUG_DISABLE') : t('DEBUG_ENABLE')} ${t('DEBUG_MODE')}`}
       >
-        🐛 Debug: {debug ? 'ON' : 'OFF'}
+        🐛 {t('DEBUG_LABEL')}: {debug ? t('DEBUG_ON') : t('DEBUG_OFF')}
       </button>
     </div>
   );

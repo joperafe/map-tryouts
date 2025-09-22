@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSensors } from '../modules/dashboard/hooks/useSensors';
 import Navigation from '../components/Navigation';
 import type { Sensor } from '../types';
@@ -23,6 +24,7 @@ interface SensorAlert {
 }
 
 export function CockpitPage() {
+  const { t } = useTranslation();
   const { sensors, loading, error } = useSensors();
   const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null);
   const [commands, setCommands] = useState<SensorCommand[]>([]);
@@ -140,7 +142,7 @@ export function CockpitPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300">Loading sensors...</p>
+            <p className="text-gray-600 dark:text-gray-300">{t('COCKPIT_LOADING_SENSORS')}</p>
           </div>
         </div>
       </div>
@@ -153,7 +155,7 @@ export function CockpitPage() {
         <Navigation />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-red-600 dark:text-red-400">Error loading sensors: {error}</p>
+            <p className="text-red-600 dark:text-red-400">{t('COCKPIT_ERROR_LOADING_SENSORS')}: {error}</p>
           </div>
         </div>
       </div>
@@ -178,19 +180,19 @@ export function CockpitPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">{activeSensors.length}</div>
-                  <div className="text-sm text-green-600 dark:text-green-400">Active</div>
+                  <div className="text-sm text-green-600 dark:text-green-400">{t('COCKPIT_STATUS_ACTIVE')}</div>
                 </div>
                 <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
                   <div className="text-2xl font-bold text-red-600 dark:text-red-400">{inactiveSensors.length}</div>
-                  <div className="text-sm text-red-600 dark:text-red-400">Offline</div>
+                  <div className="text-sm text-red-600 dark:text-red-400">{t('COCKPIT_STATUS_OFFLINE')}</div>
                 </div>
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
                   <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{unacknowledgedAlerts.length}</div>
-                  <div className="text-sm text-yellow-600 dark:text-yellow-400">Alerts</div>
+                  <div className="text-sm text-yellow-600 dark:text-yellow-400">{t('COCKPIT_ALERTS')}</div>
                 </div>
                 <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
                   <div className="text-2xl font-bold text-red-600 dark:text-red-400">{criticalAlerts.length}</div>
-                  <div className="text-sm text-red-600 dark:text-red-400">Critical</div>
+                  <div className="text-sm text-red-600 dark:text-red-400">{t('COCKPIT_STATUS_CRITICAL')}</div>
                 </div>
               </div>
             </div>
@@ -198,7 +200,7 @@ export function CockpitPage() {
             {/* Sensor List */}
             <div className="flex-1 overflow-y-auto">
               <div className="p-4">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Sensors</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{t('COCKPIT_SENSORS')}</h3>
                 <div className="space-y-2">
                   {sensors.map((sensor: Sensor) => (
                     <button
@@ -236,10 +238,10 @@ export function CockpitPage() {
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               <div className="flex space-x-8 px-6">
                 {[
-                  { id: 'overview', label: 'Overview' },
-                  { id: 'commands', label: 'Commands' },
-                  { id: 'alerts', label: 'Alerts' },
-                  { id: 'settings', label: 'Settings' }
+                  { id: 'overview', label: t('COCKPIT_TAB_OVERVIEW') },
+                  { id: 'commands', label: t('COCKPIT_TAB_COMMANDS') },
+                  { id: 'alerts', label: t('COCKPIT_TAB_ALERTS') },
+                  { id: 'settings', label: t('COCKPIT_TAB_SETTINGS') }
                 ].map((tab) => (
                   <button
                     key={tab.id}
