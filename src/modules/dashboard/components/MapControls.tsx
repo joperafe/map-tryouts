@@ -23,6 +23,12 @@ const MapControlsComponent = React.forwardRef<HTMLDivElement, MapControlsProps>(
   const { currentBaseMap, setBaseMap } = useMapData();
   const mapSettingsConfig = useMapSettings();
   const [showBaseMapDropdown, setShowBaseMapDropdown] = useState(false);
+
+  // Memoize the sorted active controls array to prevent unnecessary re-renders
+  const activeControlsArray = React.useMemo(() => 
+    Array.from(activeControls).sort(), 
+    [activeControls]
+  );
   
   // Handle clicks outside dropdown to close it
   useEffect(() => {
@@ -152,7 +158,7 @@ const MapControlsComponent = React.forwardRef<HTMLDivElement, MapControlsProps>(
           const control = controlsSettings[controlType];
           const translatedLabel = control.label ? localize(control.label) : controlType;
           const translatedTooltip = control.tooltip ? localize(control.tooltip) : translatedLabel;
-          const isActive = activeControls.has(controlType);
+          const isActive = activeControlsArray.includes(controlType);
           
           // Special handling for base map selector
           if (controlType === 'base_map_selector') {
@@ -193,18 +199,5 @@ const MapControlsComponent = React.forwardRef<HTMLDivElement, MapControlsProps>(
   );
 });
 
-// Memoize the component to prevent unnecessary re-renders
-export const MapControls = React.memo(MapControlsComponent, (prevProps, nextProps) => {
-  // Custom comparison function to avoid re-renders when activeControls Set is recreated with the same values
-  const prevActiveArray = Array.from(prevProps.activeControls || new Set()).sort();
-  const nextActiveArray = Array.from(nextProps.activeControls || new Set()).sort();
-  
-  return (
-    prevProps.controlsSettings === nextProps.controlsSettings &&
-    prevProps.mapControls === nextProps.mapControls &&
-    prevProps.mapSettings === nextProps.mapSettings &&
-    prevProps.onControlClick === nextProps.onControlClick &&
-    prevActiveArray.length === nextActiveArray.length &&
-    prevActiveArray.every((item, index) => item === nextActiveArray[index])
-  );
-});
+// Export the component directly - using useMemo internally for optimization
+export const MapControls = MapControlsComponent;
