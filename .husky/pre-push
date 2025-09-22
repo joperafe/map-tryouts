@@ -10,7 +10,7 @@
 echo "🔍 Pre-push validation starting..."
 
 # Run the validation script
-node scripts/validate-push.js
+node scripts/validate-push.cjs
 
 # Exit with the same code as the validation script
 exit $?

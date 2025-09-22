@@ -20,7 +20,7 @@
     "test:ci": "jest --ci --coverage --passWithNoTests",
     "format": "prettier --write .",
     "format:locales": "node scripts/format-locales.js",
-    "validate": "node scripts/validate-push.js",
+    "validate": "node scripts/validate-push.cjs",
     "push": "npm run validate && git push",
     "push:origin": "npm run validate && git push origin",
     "push:main": "npm run validate && git push origin main",

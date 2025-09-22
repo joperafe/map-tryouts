@@ -143,7 +143,7 @@ npm run push:unsafe:main
 
 ### Modifying Validation Checks
 
-Edit `scripts/validate-push.js` to:
+Edit `scripts/validate-push.cjs` to:
 - Add new validation steps
 - Modify existing checks
 - Change error handling
@@ -176,14 +176,14 @@ chmod +x .husky/pre-push
 
 ### Validation Script Errors
 
-If `scripts/validate-push.js` fails to run:
+If `scripts/validate-push.cjs` fails to run:
 
 ```bash
 # Check Node.js version (requires Node 14+)
 node --version
 
 # Verify script exists and is executable
-ls -la scripts/validate-push.js
+ls -la scripts/validate-push.cjs
 ```
 
 ### CI/CD Integration
