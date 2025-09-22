@@ -54,27 +54,27 @@ export function WiFiCoveragePage() {
               <h3 class="font-semibold text-lg mb-2">${hotspot.name}</h3>
               <div class="space-y-1 text-sm">
                 <div class="flex justify-between">
-                  <span>Provider:</span>
+                  <span>${t('WIFI_POPUP_PROVIDER')}:</span>
                   <span class="font-medium">${hotspot.provider}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Signal Strength:</span>
+                  <span>${t('WIFI_POPUP_SIGNAL_STRENGTH')}:</span>
                   <span class="font-medium">${Math.round(hotspot.signalStrength * 100)}%</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Frequency:</span>
+                  <span>${t('WIFI_POPUP_FREQUENCY')}:</span>
                   <span class="font-medium">${hotspot.frequency}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Type:</span>
-                  <span class="font-medium">${hotspot.isPublic ? 'Public' : 'Private'}</span>
+                  <span>${t('WIFI_POPUP_TYPE')}:</span>
+                  <span class="font-medium">${hotspot.isPublic ? t('WIFI_POPUP_PUBLIC') : t('WIFI_POPUP_PRIVATE')}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Users:</span>
+                  <span>${t('WIFI_POPUP_USERS')}:</span>
                   <span class="font-medium">${hotspot.currentUsers}/${hotspot.maxUsers}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span>Speed:</span>
+                  <span>${t('WIFI_POPUP_SPEED')}:</span>
                   <span class="font-medium">${hotspot.speed.download}↓/${hotspot.speed.upload}↑ Mbps</span>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export function WiFiCoveragePage() {
     };
 
     return markerLayer;
-  }, [filteredHotspots, showHotspots]);
+  }, [filteredHotspots, showHotspots, t]);
 
   // Create WiFi coverage heatmap
   const coverageHeatmap = useMemo(() => {
@@ -140,7 +140,7 @@ export function WiFiCoveragePage() {
 
   // Early return after all hooks
   if (!instanceSettings || !mapConfig) {
-    return <div>Loading...</div>;
+    return <div>{t('COMMON_LOADING_GENERIC')}</div>;
   }
 
   // Statistics cards data
@@ -153,7 +153,7 @@ export function WiFiCoveragePage() {
     },
     {
       icon: '🌐',
-      label: 'Public Hotspots',
+      label: t('COMMON_PUBLIC_HOTSPOTS'),
       value: wifiStats.publicHotspots,
       color: 'text-green-600 dark:text-green-400'
     },
@@ -165,19 +165,19 @@ export function WiFiCoveragePage() {
     },
     {
       icon: '👥',
-      label: 'Connected Users',
+      label: t('COMMON_CONNECTED_USERS'),
       value: wifiStats.totalConnectedUsers,
       color: 'text-purple-600 dark:text-purple-400'
     },
     {
       icon: '⚡',
-      label: 'Avg Speed',
+      label: t('COMMON_AVG_SPEED'),
       value: `${Math.round(wifiStats.averageDownloadSpeed)} Mbps`,
       color: 'text-orange-600 dark:text-orange-400'
     },
     {
       icon: '🛡️',
-      label: 'Network Usage',
+      label: t('COMMON_NETWORK_USAGE'),
       value: `${Math.round(wifiStats.utilizationRate * 100)}%`,
       color: 'text-red-600 dark:text-red-400'
     }
@@ -255,10 +255,10 @@ export function WiFiCoveragePage() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <div className="mb-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Interactive Coverage Map
+            {t('WIFI_MAP_TITLE')}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Click on hotspot markers to view details. Use measurement tools to analyze coverage areas.
+            {t('WIFI_MAP_DESCRIPTION')}
           </p>
         </div>
         
@@ -278,40 +278,40 @@ export function WiFiCoveragePage() {
       {/* Legend */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Map Legend
+          {t('WIFI_LEGEND_TITLE')}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Signal Strength Legend */}
           <div>
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Signal Strength</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white mb-3">{t('WIFI_LEGEND_SIGNAL_STRENGTH')}</h4>
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-300">Weak (10-30%)</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">{t('WIFI_LEGEND_WEAK')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-4 h-4 bg-cyan-500 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-300">Fair (30-50%)</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">{t('WIFI_LEGEND_FAIR')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-4 h-4 bg-emerald-500 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-300">Good (50-70%)</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">{t('WIFI_LEGEND_GOOD')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-4 h-4 bg-amber-500 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-300">Strong (70-90%)</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">{t('WIFI_LEGEND_STRONG')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-4 h-4 bg-red-500 rounded"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-300">Excellent (90-100%)</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">{t('WIFI_LEGEND_EXCELLENT')}</span>
               </div>
             </div>
           </div>
 
           {/* Providers Legend */}
           <div>
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Providers</h4>
+            <h4 className="font-medium text-gray-900 dark:text-white mb-3">{t('WIFI_LEGEND_PROVIDERS')}</h4>
             <div className="space-y-2">
               {Object.entries(providerColors).slice(0, -1).map(([provider, color]) => (
                 <div key={provider} className="flex items-center space-x-3">

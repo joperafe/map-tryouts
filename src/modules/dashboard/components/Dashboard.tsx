@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapView } from './MapView';
 import { ThemeToggle } from '../../../components/ThemeToggle';
 import Navigation from '../../../components/Navigation';
@@ -9,6 +10,7 @@ import { useSettings } from '../../../hooks';
 import { useRuntimeEnvironment } from '../../../utils/useRuntimeEnvironment';
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const settings = useSettings();
   const { environment, config: runtimeConfig } = useRuntimeEnvironment();
   const sensorLayers = useSensorLayers();
@@ -32,7 +34,7 @@ export function Dashboard() {
       <div className="h-full flex items-center justify-center">
         <section className="text-center" role="status" aria-live="polite">
           <div className="loading-spinner mx-auto mb-4" aria-hidden="true"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading environmental data...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('DASHBOARD_LOADING_DATA')}</p>
         </section>
       </div>
     );
@@ -44,7 +46,7 @@ export function Dashboard() {
         <section className="text-center max-w-md" role="alert" aria-live="assertive">
           <div className="text-red-500 text-6xl mb-4" aria-hidden="true">⚠️</div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Error Loading Data
+            {t('DASHBOARD_ERROR_LOADING_DATA')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
             {errors.sensors || errors.greenZones}
@@ -55,9 +57,9 @@ export function Dashboard() {
                 refreshAllLayers();
               }}
               className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-              aria-label="Retry loading environmental data"
+              aria-label={t('DASHBOARD_RETRY_ARIA_LABEL')}
             >
-              Retry
+              {t('DASHBOARD_RETRY')}
             </button>
           </div>
         </section>
