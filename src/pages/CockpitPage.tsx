@@ -26,6 +26,8 @@ interface SensorAlert {
 export function CockpitPage() {
   const { t } = useTranslation();
   const { sensors, loading, error } = useSensors();
+  // Defensive: ensure sensors is an array (some environments may return an object or null)
+  const sensorsList = Array.isArray(sensors) ? sensors : (console.warn('[CockpitPage] sensors is not an array, coercing to empty array', sensors), [] as Sensor[]);
   const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null);
   const [commands, setCommands] = useState<SensorCommand[]>([]);
   const [alerts, setAlerts] = useState<SensorAlert[]>([]);
@@ -33,8 +35,8 @@ export function CockpitPage() {
 
   // Generate mock alerts based on sensor data
   useEffect(() => {
-    if (sensors.length > 0) {
-      const mockAlerts: SensorAlert[] = sensors.flatMap((sensor: Sensor) => {
+    if (sensorsList.length > 0) {
+      const mockAlerts: SensorAlert[] = sensorsList.flatMap((sensor: Sensor) => {
         const sensorAlerts: SensorAlert[] = [];
         
         // Temperature alerts
@@ -162,8 +164,8 @@ export function CockpitPage() {
     );
   }
 
-  const activeSensors = sensors.filter((sensor: Sensor) => sensor.status === 'active');
-  const inactiveSensors = sensors.filter((sensor: Sensor) => sensor.status === 'inactive');
+  const activeSensors = sensorsList.filter((sensor: Sensor) => sensor.status === 'active');
+  const inactiveSensors = sensorsList.filter((sensor: Sensor) => sensor.status === 'inactive');
   const unacknowledgedAlerts = alerts.filter(alert => !alert.acknowledged);
   const criticalAlerts = alerts.filter(alert => alert.severity === 'critical' && !alert.acknowledged);
 
@@ -202,7 +204,7 @@ export function CockpitPage() {
               <div className="p-4">
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{t('COCKPIT_SENSORS')}</h3>
                 <div className="space-y-2">
-                  {sensors.map((sensor: Sensor) => (
+                  {sensorsList.map((sensor: Sensor) => (
                     <button
                       key={sensor.id}
                       onClick={() => setSelectedSensor(sensor)}
