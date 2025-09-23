@@ -1,10 +1,17 @@
 import { useTheme } from '../contexts/store';
+import useTracking from '../hooks/useTracking';
 
 export function ThemeToggle() {
   const { setMode, isDarkMode } = useTheme();
+  const { track } = useTracking();
 
   const toggleTheme = () => {
     setMode(isDarkMode ? 'light' : 'dark');
+    try {
+      track('theme.toggle', { to: isDarkMode ? 'light' : 'dark' });
+    } catch {
+      // noop
+    }
   };
 
   return (
