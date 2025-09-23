@@ -363,3 +363,36 @@
 .leaflet-draw-actions-bottom {
   margin-top: 0;
 }
+
+/* Range Slider Styles */
+@layer utilities {
+  .range-slider {
+    @apply flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer;
+    @apply dark:bg-gray-700;
+  }
+  
+  .range-slider::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 bg-blue-600 rounded-full cursor-pointer;
+    @apply dark:bg-blue-500;
+  }
+  
+  .range-slider::-moz-range-thumb {
+    @apply w-4 h-4 bg-blue-600 rounded-full cursor-pointer border-0;
+    @apply dark:bg-blue-500;
+  }
+  
+  .range-slider::-ms-thumb {
+    @apply w-4 h-4 bg-blue-600 rounded-full cursor-pointer border-0;
+    @apply dark:bg-blue-500;
+  }
+  
+  .range-slider:focus::-webkit-slider-thumb {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+    @apply dark:ring-offset-gray-800;
+  }
+  
+  .range-slider:focus::-moz-range-thumb {
+    @apply ring-2 ring-blue-500 ring-offset-2 ring-offset-white;
+    @apply dark:ring-offset-gray-800;
+  }
+}

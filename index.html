@@ -13,14 +13,25 @@
       // https://github.com/rafgraph/spa-github-pages
       // Only run this script on GitHub Pages, not on Vercel or other platforms
       (function(l) {
+        // Detect if we're on Vercel first (priority check)
+        var isVercel = l.hostname.includes('vercel.app') || 
+                      l.hostname.includes('.vercel.app') ||
+                      l.hostname === 'map-tryouts.vercel.app';
+        
+        // Early exit for Vercel to prevent any redirect logic
+        if (isVercel) {
+          console.log('🔧 Vercel detected: Completely skipping GitHub Pages redirect script', {
+            hostname: l.hostname,
+            pathname: l.pathname,
+            search: l.search
+          });
+          return; // Exit immediately, don't run any redirect logic
+        }
+        
         // Detect if we're on GitHub Pages
         var isGitHubPages = l.hostname === 'joperafe.github.io' || 
                            l.hostname.includes('.github.io') ||
                            l.pathname.includes('/map-tryouts/');
-        
-        // Detect if we're on Vercel (skip redirect script)
-        var isVercel = l.hostname.includes('vercel.app') || 
-                      l.hostname.includes('.vercel.app');
         
         console.log('🔧 Platform Detection:', {
           hostname: l.hostname,
@@ -31,7 +42,7 @@
         });
         
         // Only process redirects for GitHub Pages
-        if (isGitHubPages && !isVercel && l.search[1] === '/' ) {
+        if (isGitHubPages && l.search[1] === '/' ) {
           var decoded = decodeURIComponent(l.search.slice(1));
           // Replace encoded ampersands back to proper format
           decoded = decoded.replace(/~and~/g, '&');
@@ -55,8 +66,6 @@
           });
           
           window.history.replaceState(null, null, newUrl);
-        } else if (isVercel) {
-          console.log('🔧 Vercel detected: Skipping SPA redirect script');
         }
       }(window.location))
     </script>
