@@ -150,6 +150,26 @@ export function AppStoreProvider({
     }
   }, [state.auth.sessionExpiry, state.auth.isAuthenticated, actions.auth]);
 
+  // Initialize system theme preference on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      const isDarkSystem = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      actions.theme.setSystemPreference(isDarkSystem ? 'dark' : 'light');
+    }
+  }, [actions.theme]);
+
+  // Apply theme to DOM
+  useEffect(() => {
+    const isDarkMode = state.theme.mode === 'dark' || 
+      (state.theme.mode === 'system' && state.theme.systemPreference === 'dark');
+    
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [state.theme.mode, state.theme.systemPreference]);
+
   // Optional: System theme detection
   useEffect(() => {
     if (state.theme.mode === 'system') {
