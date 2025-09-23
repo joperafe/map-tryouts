@@ -200,6 +200,25 @@ export function AppStoreProvider({
     actions.mapData
   ]);
 
+  // One-time initial load of map data layers on app mount
+  useEffect(() => {
+    // Don't gate initial load on authentication; load basic public layers like air quality
+    let cancelled = false;
+
+    (async () => {
+      try {
+        await actions.mapData.refreshAllLayers();
+      } catch (err) {
+        // swallow errors - they will be surfaced via state.errors
+        if (!cancelled) console.error('Initial map data load failed:', err);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  // Run only once on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <AppStoreContext.Provider value={contextValue}>
       {children}
