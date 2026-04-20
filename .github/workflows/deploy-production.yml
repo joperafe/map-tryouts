@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -32,10 +32,23 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      - name: Ensure Pages uses GitHub Actions builds
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.repos.updateInformationAboutPagesSite({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                build_type: 'workflow'
+              });
+              core.info('GitHub Pages build_type ensured as workflow.');
+            } catch (error) {
+              core.warning(`Could not update GitHub Pages build_type to workflow: ${error.message}`);
+            }
+
       - name: Build for production
-        run: |
-          npm run config:prod
-          npm run build
+        run: npm run build:github
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
