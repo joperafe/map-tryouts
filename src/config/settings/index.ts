@@ -67,7 +67,7 @@ const createEnvironmentOverrides = (env: string): Partial<EnvironmentSettings> =
 const loadRuntimeConfig = async (): Promise<EnvironmentSettings> => {
   try {
     // Determine the correct path based on environment
-    const basePath = import.meta.env.PROD ? '/map-tryouts' : '';
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
     const configPath = `${basePath}/active.settings.json`;
     
     // Try to fetch from public directory (production/deployed environments)
