@@ -17,8 +17,9 @@ export class AirQualityService {
    */
   private static async loadMockData(): Promise<AirQualityObserved[]> {
     try {
-      // Use proper base path for production builds  
-      const basePath = import.meta.env.PROD ? '/map-tryouts' : '';
+      // Use Vite's BASE_URL so the path is correct for all deployment targets
+      // (e.g. '/' on Vercel, '/map-tryouts/' on GitHub Pages)
+      const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
       const mockDataUrl = `${basePath}/air-quality.mock.json`;
       
       const response = await axios.get(mockDataUrl, {
@@ -26,6 +27,12 @@ export class AirQualityService {
         validateStatus: (status) => status >= 200 && status < 300,
         responseType: 'json'
       });
+      if (!Array.isArray(response.data)) {
+        const preview = typeof response.data === 'string'
+          ? response.data.slice(0, 100)
+          : JSON.stringify(response.data).slice(0, 100);
+        throw new Error(`Mock data is not an array (got ${typeof response.data}): ${preview}`);
+      }
       return response.data;
     } catch (error) {
       console.error('Failed to load mock air quality data:', error);
@@ -84,6 +91,10 @@ export class AirQualityService {
    * Transform raw FIWARE data into normalized air quality stations
    */
   static normalizeData(rawData: AirQualityObserved[]): AirQualityStation[] {
+    if (!Array.isArray(rawData)) {
+      console.error('[AirQuality] normalizeData received non-array data:', typeof rawData);
+      return [];
+    }
     const normalized = rawData
       .filter(station => {
         const isKeyValue = this.isKeyValueFormat(station);

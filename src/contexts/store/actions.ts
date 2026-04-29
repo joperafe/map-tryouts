@@ -116,7 +116,7 @@ export const mapDataActionCreators = {
       'sensors',
       async () => {
         const response = await httpService.getSensors();
-        if (response.success && response.data) {
+        if (response.success && Array.isArray(response.data)) {
           return response.data;
         }
         throw new Error('Failed to fetch sensors');
@@ -131,7 +131,7 @@ export const mapDataActionCreators = {
       'greenZones',
       async () => {
         const response = await httpService.getGreenZones();
-        if (response.success && response.data) {
+        if (response.success && Array.isArray(response.data)) {
           return response.data;
         }
         throw new Error('Failed to fetch green zones');

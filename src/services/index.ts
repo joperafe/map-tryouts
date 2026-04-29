@@ -7,7 +7,13 @@ let _httpService: HttpService | null = null;
 export const getHttpService = (): HttpService => {
   if (!_httpService) {
     const config = getConfig();
-    _httpService = new HttpService(config.environment.API.baseUrl);
+    // Prepend Vite's BASE_URL so paths are correct for all deployment targets
+    // (e.g. '/' on Vercel → '/data', '/map-tryouts/' on GitHub Pages → '/map-tryouts/data')
+    // apiBaseUrl must start with '/' (as defined in all environment settings files)
+    const apiBaseUrl = config.environment.API.baseUrl;
+    const normalizedApiBaseUrl = apiBaseUrl.startsWith('/') ? apiBaseUrl : `/${apiBaseUrl}`;
+    const baseUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}${normalizedApiBaseUrl}`;
+    _httpService = new HttpService(baseUrl);
   }
   return _httpService;
 };
